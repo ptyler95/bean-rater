@@ -277,6 +277,7 @@ export type Database = {
           recipe_count: number
         }[]
       }
+      find_or_create_brand: { Args: { p_name: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
       search_bags: {
         Args: { q: string }

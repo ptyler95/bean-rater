@@ -63,7 +63,21 @@ export function BagSearch() {
         <div className="absolute z-30 top-full mt-1 inset-x-0 rounded-md border bg-popover shadow-md overflow-hidden">
           {results.length === 0 ? (
             <p className="px-4 py-3 text-sm text-muted-foreground">
-              {searching ? "Searching…" : "No bags match. Try fewer words?"}
+              {searching ? (
+                "Searching…"
+              ) : (
+                <>
+                  No bags match.{" "}
+                  <Link
+                    href="/bags/new"
+                    className="text-primary underline underline-offset-2"
+                    onClick={() => setOpen(false)}
+                  >
+                    Add this bag
+                  </Link>
+                  ?
+                </>
+              )}
             </p>
           ) : (
             <ul>

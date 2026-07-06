@@ -35,6 +35,7 @@ export async function proxy(request: NextRequest) {
 
   const needsAuth =
     pathname.startsWith("/admin") ||
+    pathname === "/bags/new" ||
     /^\/bags\/[^/]+\/submit/.test(pathname)
 
   if (!user && needsAuth) {

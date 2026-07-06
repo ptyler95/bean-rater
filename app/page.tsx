@@ -21,6 +21,14 @@ export default async function HomePage() {
         <BagSearch />
         <p className="text-xs text-muted-foreground">
           Community-submitted doses, temps, and times per bag and brew method.
+          Can&apos;t find yours?{" "}
+          <Link
+            href="/bags/new"
+            className="text-primary underline underline-offset-2"
+          >
+            Add a bag
+          </Link>
+          .
         </p>
       </section>
 

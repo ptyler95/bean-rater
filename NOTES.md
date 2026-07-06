@@ -74,6 +74,19 @@ and what's left for a real launch.
   `oklch(0.973 0.006 78)`, near-black ink, one muted rust accent
   `oklch(0.52 0.115 42)`, label-over-value stat blocks, 5-dot rating scale.
 
+## Add-bag flow (added 2026-07-06, post-launch)
+
+- `/bags/new` (auth-gated): single-column grouped form — roaster → coffee
+  identity → optional details. Entry points under the home search and in the
+  search dropdown's no-results state.
+- Brands: the spec's "no public write access to Brand" is preserved at the
+  table level; the only write path is a `find_or_create_brand(name)`
+  SECURITY DEFINER RPC (authenticated-only) that sets name + server-side slug
+  and nothing else. The atomic `on conflict` upsert also fixes the
+  brand-creation race condition noted in the old June README.
+- Brand field autocompletes against existing brands so spellings converge;
+  free text creates a new brand.
+
 ## To make yourself admin
 
 After you first sign in (magic link), run in the Supabase SQL editor:
@@ -85,7 +98,6 @@ where user_id = (select id from auth.users where email = 'ptyler95@gmail.com');
 
 ## What's left for a real launch (out of scope per brief)
 
-- Add-bag / add-brand UI (needs a decision on who may create brands).
 - Roaster claim flow (`brands.claimed/claimed_by` exist but nothing sets them).
 - Community/roaster verification workflows (`verification_status` is set only
   by hand today).
