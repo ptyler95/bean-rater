@@ -277,6 +277,30 @@ export type Database = {
           recipe_count: number
         }[]
       }
+      browse_bags: {
+        Args: {
+          p_brand_slug?: string | null
+          p_brew_method?: Database["public"]["Enums"]["brew_method"] | null
+          p_roast_level?: Database["public"]["Enums"]["roast_level"] | null
+          p_sort?: string
+          p_page?: number
+          p_page_size?: number
+        }
+        Returns: {
+          bag_id: string
+          coffee_name: string
+          origin: string
+          roast_level: Database["public"]["Enums"]["roast_level"]
+          process: Database["public"]["Enums"]["process_method"]
+          verification_status: Database["public"]["Enums"]["verification_status"]
+          brand_name: string
+          brand_slug: string
+          recipe_count: number
+          avg_rating: number | null
+          created_at: string
+          total_count: number
+        }[]
+      }
       find_or_create_brand: { Args: { p_name: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
       search_bags: {

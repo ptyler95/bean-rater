@@ -87,6 +87,19 @@ and what's left for a real launch.
 - Brand field autocompletes against existing brands so spellings converge;
   free text creates a new brand.
 
+## Homepage v2 (added 2026-07-06, post-launch)
+
+- Directory replaces the flat "recently added" list: 15 bags/page with a
+  prev/next pager, filters for brand / brew method / roast level, and a sort
+  control (newest / top rated / most recipes). All state lives in the URL.
+- Backed by a `browse_bags` RPC that filters, sorts, and paginates in one
+  query and repeats the total filtered count per row for the pager. When a
+  brew-method filter is active, each bag's recipe count and average rating
+  are scoped to that method, and bags with no recipes for it drop out.
+- "Top rated" is a sort rather than a filter so unrated new bags stay
+  discoverable (filtering them out would fight the crowdsourcing loop).
+- Rows now show the average-rating dot scale and recipe count.
+
 ## To make yourself admin
 
 After you first sign in (magic link), run in the Supabase SQL editor:
