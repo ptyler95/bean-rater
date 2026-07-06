@@ -52,7 +52,7 @@ export function RecipeForm({
   } = useForm<RecipeFormInput, unknown, RecipeFormValues>({
     resolver: zodResolver(recipeSchema),
     defaultValues: {
-      brew_method: defaultMethod ?? "v60",
+      brew_method: defaultMethod ?? "pour_over",
       grind_category: "medium",
     },
   })

@@ -2,7 +2,7 @@ import type { Enums } from "@/lib/database.types"
 
 export const BREW_METHOD_LABELS: Record<Enums<"brew_method">, string> = {
   espresso: "Espresso",
-  v60: "V60",
+  pour_over: "Pour Over",
   aeropress: "AeroPress",
   french_press: "French Press",
   moka_pot: "Moka Pot",

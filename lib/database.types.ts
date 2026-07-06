@@ -149,6 +149,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          brand_id: string | null
           created_at: string
           display_name: string | null
           recipe_count: number
@@ -157,6 +158,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          brand_id?: string | null
           created_at?: string
           display_name?: string | null
           recipe_count?: number
@@ -165,6 +167,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          brand_id?: string | null
           created_at?: string
           display_name?: string | null
           recipe_count?: number
@@ -172,7 +175,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recipes: {
         Row: {
@@ -301,7 +312,21 @@ export type Database = {
           total_count: number
         }[]
       }
+      assign_brand_admin: {
+        Args: { p_email: string; p_brand_slug: string | null }
+        Returns: undefined
+      }
       find_or_create_brand: { Args: { p_name: string }; Returns: string }
+      is_brand_admin_for: { Args: { p_brand_id: string }; Returns: boolean }
+      list_brand_admins: {
+        Args: never
+        Returns: {
+          email: string
+          display_name: string | null
+          brand_name: string | null
+          brand_slug: string | null
+        }[]
+      }
       is_admin: { Args: never; Returns: boolean }
       search_bags: {
         Args: { q: string }
@@ -324,7 +349,7 @@ export type Database = {
     Enums: {
       brew_method:
         | "espresso"
-        | "v60"
+        | "pour_over"
         | "aeropress"
         | "french_press"
         | "moka_pot"
@@ -341,7 +366,7 @@ export type Database = {
         | "extra_coarse"
       process_method: "washed" | "natural" | "honey" | "anaerobic" | "other"
       roast_level: "light" | "medium_light" | "medium" | "medium_dark" | "dark"
-      user_role: "user" | "admin"
+      user_role: "user" | "admin" | "brand_admin"
       verification_status:
         | "unverified"
         | "community_verified"
@@ -475,7 +500,7 @@ export const Constants = {
     Enums: {
       brew_method: [
         "espresso",
-        "v60",
+        "pour_over",
         "aeropress",
         "french_press",
         "moka_pot",
@@ -494,7 +519,7 @@ export const Constants = {
       ],
       process_method: ["washed", "natural", "honey", "anaerobic", "other"],
       roast_level: ["light", "medium_light", "medium", "medium_dark", "dark"],
-      user_role: ["user", "admin"],
+      user_role: ["user", "admin", "brand_admin"],
       verification_status: [
         "unverified",
         "community_verified",

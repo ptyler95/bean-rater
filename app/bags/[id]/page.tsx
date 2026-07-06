@@ -15,8 +15,11 @@ export default async function BagPage({
 }) {
   const { id } = await params
   const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  const [{ data: bag }, { data: consensus }, { data: recipes }] =
+  const [{ data: bag }, { data: consensus }, { data: recipes }, { data: profile }] =
     await Promise.all([
       supabase
         .from("bags")
@@ -29,12 +32,30 @@ export default async function BagPage({
         .select("*, profiles(display_name)")
         .eq("bag_id", id)
         .order("created_at", { ascending: false }),
+      user
+        ? supabase
+            .from("profiles")
+            .select("role, brand_id")
+            .eq("user_id", user.id)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
     ])
 
   if (!bag) notFound()
 
+  const canEdit =
+    profile?.role === "admin" ||
+    (profile?.role === "brand_admin" && profile.brand_id === bag.brand_id)
+
   return (
     <div className="pt-8 space-y-8">
+      {bag.flagged && (
+        <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          This bag is hidden from the public site pending review. You can see
+          it because of your role or because you added it.
+        </p>
+      )}
+
       {/* Identity */}
       <header className="space-y-4">
         <div className="space-y-1">
@@ -64,16 +85,26 @@ export default async function BagPage({
           <Button nativeButton={false} render={<Link href={`/bags/${bag.id}/submit`} />}>
             Submit your recipe
           </Button>
-          {bag.product_url && (
-            <a
-              href={bag.product_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-muted-foreground underline underline-offset-2"
-            >
-              Roaster page ↗
-            </a>
-          )}
+          <span className="flex items-center gap-3">
+            {canEdit && (
+              <Link
+                href={`/bags/${bag.id}/edit`}
+                className="text-xs text-muted-foreground underline underline-offset-2"
+              >
+                Edit bag
+              </Link>
+            )}
+            {bag.product_url && (
+              <a
+                href={bag.product_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground underline underline-offset-2"
+              >
+                Roaster page ↗
+              </a>
+            )}
+          </span>
         </div>
       </header>
 

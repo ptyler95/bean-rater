@@ -36,9 +36,25 @@ export const bagSchema = z.object({
   ),
   product_url: z.preprocess(
     emptyToUndef,
-    z.url("Must be a full URL (https://…)").max(300).optional()
+    z
+      .url({
+        protocol: /^https?$/,
+        error: "Must be a full web URL (https://…)",
+      })
+      .max(300)
+      .optional()
   ),
 })
+
+/** Bag editing (admin / brand admin): brand is fixed; verification editable. */
+export const bagEditSchema = bagSchema
+  .omit({ brand_name: true })
+  .extend({
+    verification_status: z.enum(Constants.public.Enums.verification_status),
+  })
+
+export type BagEditInput = z.input<typeof bagEditSchema>
+export type BagEditValues = z.output<typeof bagEditSchema>
 
 export type BagFormInput = z.input<typeof bagSchema>
 export type BagFormValues = z.output<typeof bagSchema>

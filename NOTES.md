@@ -100,6 +100,39 @@ and what's left for a real launch.
   discoverable (filtering them out would fight the crowdsourcing loop).
 - Rows now show the average-rating dot scale and recipe count.
 
+## Moderation version (added 2026-07-06, post-launch)
+
+- **Admin panel** (`/admin`, full admins): all bags sorted by flag reports,
+  view filters (all / hidden / reported), and per-bag actions — Edit,
+  Hide/Republish (republish resets the counter and clears old reports so one
+  new flag can't instantly re-hide), verification setter, Delete (behind a
+  confirm reveal). Auto-hide at 3 flags is unchanged.
+- **Brand admins**: `role='brand_admin'` + `profiles.brand_id`. They see only
+  their brand's catalog in `/admin` (including hidden bags), can add and edit
+  those bags, and their additions/edits can carry `roaster_verified` — but a
+  DB trigger blocks them (and everyone but full admins) from touching
+  `flagged`/`flag_count`, so a roaster can't unhide their own flagged listing.
+  Assignment is by email + brand in the admin panel (`assign_brand_admin`
+  RPC); demo.otto@beanrater.local is Meridian's brand admin as a live example.
+- **Archive user**: deleting an auth user now cascades their profile away but
+  reassigns their bags/recipes to the sentinel "Archive" user
+  (`archive@beanrater.local`) via `ON DELETE SET DEFAULT` — community data
+  survives account deletion, and admins can edit/delete archived recipes.
+- **User dashboard** (`/dashboard`): your submitted recipes with spec
+  summaries and delete. Recipe *editing* is still deferred.
+- **Legal**: `/privacy` and `/terms` drafted and linked in the footer. These
+  are sensible drafts, not legal advice — have a professional review them
+  before serious scale.
+- **Security items from the brief**: `product_url` now restricted to
+  http(s) in Zod *and* by DB check constraints (also `brands.website`);
+  baseline security headers (nosniff, frame-deny, referrer policy,
+  permissions policy) added in `next.config.ts`.
+- **Renamed `v60` → `pour_over`** across enum, data, and labels; the specific
+  brewer (V60, Origami, Kalita…) belongs in the recipe's brewer field.
+- Note for SQL maintenance: end-user API updates to `flagged`/`flag_count`
+  are reverted by the guard trigger unless the caller is an admin; SQL-editor
+  and service contexts (no `auth.uid()`) bypass the guard.
+
 ## To make yourself admin
 
 After you first sign in (magic link), run in the Supabase SQL editor:

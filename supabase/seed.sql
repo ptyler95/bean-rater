@@ -91,13 +91,13 @@ insert into public.recipes
    grind_category, rating, notes, freshness_offset, grinder_model, machine_model, burr_type, created_at)
 values
   -- Yirgacheffe Kochere: 4x v60 + 1 aeropress
-  ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'v60', 15, null, 250, 165, 94, 'medium_fine', 5,
+  ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'pour_over', 15, null, 250, 165, 94, 'medium_fine', 5,
    'Blooms huge. Florals pop at 94°C, went muddy any finer.', 'under_7', 'Comandante C40', 'Hario V60 02', 'conical', now() - interval '75 days'),
-  ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000002', 'v60', 18, null, 300, 180, 93, 'medium_fine', 4,
+  ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000002', 'pour_over', 18, null, 300, 180, 93, 'medium_fine', 4,
    'Classic 1:16.7. Jasmine and lemon curd.', '7_to_14', 'Fellow Ode Gen 2', 'Hario V60 02', 'flat', now() - interval '70 days'),
-  ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000003', 'v60', 20, null, 320, 195, 95, 'medium', 4,
+  ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000003', 'pour_over', 20, null, 320, 195, 95, 'medium', 4,
    'Coarser + hotter = sweeter cup for me.', 'under_7', 'Baratza Encore ESP', 'Hario V60 03', 'conical', now() - interval '55 days'),
-  ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000004', 'v60', 15, null, 240, 150, 92, 'medium_fine', 5,
+  ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000004', 'pour_over', 15, null, 240, 150, 92, 'medium_fine', 5,
    'Fast single-pour, no bypass. Tea-like.', '14_to_21', '1Zpresso JX-Pro', null, 'conical', now() - interval '30 days'),
   ('c0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000005', 'aeropress', 16, null, 230, 120, 88, 'medium_fine', 4,
    'Inverted, 2 min steep, slow press.', '7_to_14', 'Comandante C40', 'AeroPress', 'conical', now() - interval '20 days'),
@@ -113,11 +113,11 @@ values
    'Ran it tighter — got some bitterness, backing off next bag.', '14_to_21', 'Niche Zero', 'La Marzocco Linea Micra', 'conical', now() - interval '22 days'),
 
   -- Nyeri AA: 3x v60 + 1 espresso
-  ('c0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000002', 'v60', 15, null, 250, 170, 96, 'medium_fine', 5,
+  ('c0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000002', 'pour_over', 15, null, 250, 170, 96, 'medium_fine', 5,
    'Blackcurrant for days. Needs the heat.', 'under_7', 'Comandante C40', 'Hario V60 02', 'conical', now() - interval '52 days'),
-  ('c0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000003', 'v60', 22, null, 360, 210, 94, 'medium', 4,
+  ('c0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000003', 'pour_over', 22, null, 360, 210, 94, 'medium', 4,
    'Big batch for two. Juicy, tomato-sweet acidity.', '7_to_14', 'Fellow Ode Gen 2', 'Hario V60 03', 'flat', now() - interval '44 days'),
-  ('c0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000005', 'v60', 16, null, 260, 175, 95, 'medium_fine', 5,
+  ('c0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000005', 'pour_over', 16, null, 260, 175, 95, 'medium_fine', 5,
    'Five pours of 52g. Best Kenyan this year.', 'under_7', '1Zpresso JX-Pro', null, 'conical', now() - interval '28 days'),
   ('c0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000001', 'espresso', 18, 45, null, 30, 94, 'fine', 3,
    'Turbo-ish shot. Bright but a bit sharp as espresso.', '14_to_21', 'DF64', 'Breville Bambino Plus', 'flat', now() - interval '18 days'),
@@ -141,15 +141,15 @@ values
    'Preheated water, low flame. Syrupy, not burnt.', 'under_7', '1Zpresso J-Max', 'Bialetti Moka Express 3-cup', 'conical', now() - interval '14 days'),
 
   -- Below-threshold combos (individual recipe lists)
-  ('c0000000-0000-4000-8000-000000000005', 'a0000000-0000-4000-8000-000000000002', 'v60', 15, null, 250, 160, 93, 'medium_fine', 4,
+  ('c0000000-0000-4000-8000-000000000005', 'a0000000-0000-4000-8000-000000000002', 'pour_over', 15, null, 250, 160, 93, 'medium_fine', 4,
    'Honey sweetness carries. Medium-fine on the C40.', 'under_7', 'Comandante C40', 'Hario V60 02', 'conical', now() - interval '50 days'),
   ('c0000000-0000-4000-8000-000000000005', 'a0000000-0000-4000-8000-000000000004', 'aeropress', 16, null, 240, 135, 89, 'medium_fine', 5,
    'Cooler water keeps it syrupy.', '7_to_14', '1Zpresso Q2', 'AeroPress', 'conical', now() - interval '33 days'),
-  ('c0000000-0000-4000-8000-000000000007', 'a0000000-0000-4000-8000-000000000005', 'v60', 15, null, 255, 185, 92, 'medium', 5,
+  ('c0000000-0000-4000-8000-000000000007', 'a0000000-0000-4000-8000-000000000005', 'pour_over', 15, null, 255, 185, 92, 'medium', 5,
    'Wild ferment funk, strawberry candy. Coarser + cooler tames it.', 'under_7', 'Comandante C40', 'Hario V60 02', 'conical', now() - interval '36 days'),
   ('c0000000-0000-4000-8000-000000000007', 'a0000000-0000-4000-8000-000000000001', 'espresso', 18, 42, null, 27, 92, 'fine', 4,
    'Fermenty but fun. 1:2.3, cooler temp.', '7_to_14', 'Niche Zero', 'Gaggia Classic Pro', 'conical', now() - interval '21 days'),
-  ('c0000000-0000-4000-8000-000000000008', 'a0000000-0000-4000-8000-000000000003', 'v60', 12, null, 200, 150, 93, 'medium_fine', 5,
+  ('c0000000-0000-4000-8000-000000000008', 'a0000000-0000-4000-8000-000000000003', 'pour_over', 12, null, 200, 150, 93, 'medium_fine', 5,
    '100g bag, tiny doses. Bergamot and white peach. Worth it.', 'under_7', 'Comandante C40', 'Origami dripper', 'conical', now() - interval '31 days'),
   ('c0000000-0000-4000-8000-000000000010', 'a0000000-0000-4000-8000-000000000001', 'french_press', 30, null, 500, 270, 94, 'coarse', 3,
    'Earthy, heavy. Fine if you like Sumatra, and I mostly do.', '14_to_21', 'Baratza Encore', 'Bodum Chambord', 'conical', now() - interval '17 days'),

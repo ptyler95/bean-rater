@@ -1,4 +1,8 @@
+import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
+import { Button } from "@/components/ui/button"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Badge } from "@/components/ui/badge"
 import {
   Table,
   TableBody,
@@ -7,10 +11,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { VERIFICATION_LABELS } from "@/lib/labels"
+import { Constants } from "@/lib/database.types"
+import {
+  deleteBag,
+  revokeBrandAdmin,
+  setBagHidden,
+  setBagVerification,
+} from "./actions"
+import { AssignBrandAdminForm } from "./assign-form"
 
-export const metadata = { title: "Admin — flagged bags" }
+export const metadata = { title: "Admin" }
 
-export default async function AdminPage() {
+const VIEWS = ["all", "hidden", "reported"] as const
+
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>
+}) {
+  const { view: viewParam } = await searchParams
+  const view = (VIEWS as readonly string[]).includes(viewParam ?? "")
+    ? (viewParam as (typeof VIEWS)[number])
+    : "all"
+
   const supabase = await createClient()
   const {
     data: { user },
@@ -19,70 +43,210 @@ export default async function AdminPage() {
   const { data: profile } = user
     ? await supabase
         .from("profiles")
-        .select("role")
+        .select("role, brand_id, brands(name)")
         .eq("user_id", user.id)
         .maybeSingle()
     : { data: null }
 
-  if (profile?.role !== "admin") {
+  const isAdmin = profile?.role === "admin"
+  const isBrandAdmin = profile?.role === "brand_admin" && !!profile.brand_id
+
+  if (!isAdmin && !isBrandAdmin) {
     return (
       <div className="pt-16 text-center space-y-2">
         <h1 className="text-lg font-semibold">Admin only</h1>
         <p className="text-sm text-muted-foreground">
-          Your account doesn&apos;t have the admin role.
+          Your account doesn&apos;t have an admin role.
         </p>
       </div>
     )
   }
 
-  // RLS: admins can read flagged bags; everyone else can't.
-  const { data: flaggedBags } = await supabase
+  // RLS already scopes visibility; the eq() below just keeps brand admins'
+  // view focused on their own catalog.
+  let query = supabase
     .from("bags")
-    .select("id, coffee_name, origin, flag_count, created_at, brands(name)")
-    .eq("flagged", true)
+    .select("id, coffee_name, origin, flagged, flag_count, verification_status, created_at, brands(name)")
     .order("flag_count", { ascending: false })
+    .order("created_at", { ascending: false })
+  if (isBrandAdmin) query = query.eq("brand_id", profile!.brand_id!)
+  if (view === "hidden") query = query.eq("flagged", true)
+  if (view === "reported") query = query.gt("flag_count", 0)
+
+  const [{ data: bags }, { data: brands }, brandAdmins] = await Promise.all([
+    query,
+    isAdmin
+      ? supabase.from("brands").select("name, slug").order("name")
+      : Promise.resolve({ data: null }),
+    isAdmin ? supabase.rpc("list_brand_admins") : Promise.resolve({ data: null }),
+  ])
 
   return (
-    <div className="pt-8 space-y-4">
-      <h1 className="text-lg font-semibold">Flagged bags</h1>
-      {(flaggedBags ?? []).length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Queue is empty — nothing flagged right now.
-        </p>
+    <div className="pt-8 space-y-8">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-lg font-semibold">
+            {isAdmin ? "Moderation" : `${profile?.brands?.name} — catalog`}
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            {isAdmin
+              ? "Sorted by flag reports. Hidden bags stay visible here."
+              : "Bags you manage. New bags you add are roaster-verified."}
+          </p>
+        </div>
+        {isBrandAdmin && (
+          <Button nativeButton={false} render={<Link href="/bags/new" />} size="sm">
+            Add bag
+          </Button>
+        )}
+      </header>
+
+      {/* View filter */}
+      <nav className="flex gap-1">
+        {VIEWS.map((v) => (
+          <Link
+            key={v}
+            href={v === "all" ? "/admin" : `/admin?view=${v}`}
+            className={`px-2.5 py-1 rounded-md font-mono text-xs uppercase tracking-wider ${
+              view === v
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted"
+            }`}
+          >
+            {v}
+          </Link>
+        ))}
+      </nav>
+
+      {(bags ?? []).length === 0 ? (
+        <p className="text-sm text-muted-foreground">Nothing in this view.</p>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Bag</TableHead>
-              <TableHead>Brand</TableHead>
-              <TableHead>Origin</TableHead>
-              <TableHead className="text-right">Flags</TableHead>
-              <TableHead className="text-right">Added</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(flaggedBags ?? []).map((bag) => (
-              <TableRow key={bag.id}>
-                <TableCell className="font-medium">
-                  <a href={`/bags/${bag.id}`} className="underline underline-offset-2">
-                    {bag.coffee_name}
-                  </a>
-                </TableCell>
-                <TableCell>{bag.brands?.name}</TableCell>
-                <TableCell>{bag.origin}</TableCell>
-                <TableCell className="text-right font-mono tabular-nums">
-                  {bag.flag_count}
-                </TableCell>
-                <TableCell className="text-right font-mono text-xs">
-                  {new Date(bag.created_at).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Bag</TableHead>
+                <TableHead className="text-right">Flags</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {(bags ?? []).map((bag) => (
+                <TableRow key={bag.id}>
+                  <TableCell>
+                    <Link
+                      href={`/bags/${bag.id}`}
+                      className="font-medium underline underline-offset-2"
+                    >
+                      {bag.coffee_name}
+                    </Link>
+                    <span className="block text-xs text-muted-foreground">
+                      {bag.brands?.name} · {bag.origin}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right font-mono tabular-nums">
+                    {bag.flag_count}
+                  </TableCell>
+                  <TableCell>
+                    <span className="flex flex-col items-start gap-1">
+                      {bag.flagged && (
+                        <Badge variant="destructive" className="font-mono text-[10px] uppercase">
+                          Hidden
+                        </Badge>
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        {VERIFICATION_LABELS[bag.verification_status]}
+                      </span>
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        nativeButton={false}
+                        render={<Link href={`/bags/${bag.id}/edit`} />}
+                        variant="outline"
+                        size="xs"
+                      >
+                        Edit
+                      </Button>
+
+                      {isAdmin && (
+                        <>
+                          <form action={setBagHidden}>
+                            <input type="hidden" name="bag_id" value={bag.id} />
+                            <input type="hidden" name="hide" value={String(!bag.flagged)} />
+                            <Button type="submit" variant="outline" size="xs">
+                              {bag.flagged ? "Republish" : "Hide"}
+                            </Button>
+                          </form>
+
+                          <form action={setBagVerification} className="flex items-center gap-1">
+                            <input type="hidden" name="bag_id" value={bag.id} />
+                            <NativeSelect
+                              name="status"
+                              defaultValue={bag.verification_status}
+                              className="h-6 w-auto text-xs py-0"
+                            >
+                              {Constants.public.Enums.verification_status.map((s) => (
+                                <option key={s} value={s}>
+                                  {VERIFICATION_LABELS[s]}
+                                </option>
+                              ))}
+                            </NativeSelect>
+                            <Button type="submit" variant="ghost" size="xs">
+                              Set
+                            </Button>
+                          </form>
+
+                          <details>
+                            <summary className="cursor-pointer text-xs text-muted-foreground hover:text-destructive list-none">
+                              Delete…
+                            </summary>
+                            <form action={deleteBag} className="inline">
+                              <input type="hidden" name="bag_id" value={bag.id} />
+                              <Button type="submit" variant="destructive" size="xs">
+                                Confirm delete
+                              </Button>
+                            </form>
+                          </details>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      {/* Brand admin management (full admins only) */}
+      {isAdmin && (
+        <section className="space-y-3 border-t pt-6">
+          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Brand admins
+          </h2>
+          {(brandAdmins?.data ?? []).length > 0 && (
+            <ul className="divide-y rounded-md border bg-card">
+              {(brandAdmins?.data ?? []).map((ba) => (
+                <li key={ba.email} className="flex items-center justify-between gap-2 px-3 py-2">
+                  <span className="text-sm min-w-0 truncate">
+                    {ba.email}
+                    <span className="text-muted-foreground"> → {ba.brand_name ?? "—"}</span>
+                  </span>
+                  <form action={revokeBrandAdmin}>
+                    <input type="hidden" name="email" value={ba.email} />
+                    <Button type="submit" variant="ghost" size="xs">
+                      Revoke
+                    </Button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          )}
+          <AssignBrandAdminForm brands={brands ?? []} />
+        </section>
       )}
     </div>
   )

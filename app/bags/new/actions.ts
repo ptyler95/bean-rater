@@ -30,12 +30,23 @@ export async function createBag(
     return { error: brandError?.message ?? "Could not resolve brand." }
   }
 
+  // A brand admin adding a bag for their own brand publishes it
+  // roaster-verified; RLS double-checks this claim.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, brand_id")
+    .eq("user_id", user.id)
+    .maybeSingle()
+  const roasterVerified =
+    profile?.role === "brand_admin" && profile.brand_id === brandId
+
   const { data: bag, error } = await supabase
     .from("bags")
     .insert({
       ...bagFields,
       brand_id: brandId,
       added_by: user.id,
+      verification_status: roasterVerified ? "roaster_verified" : "unverified",
     })
     .select("id")
     .single()

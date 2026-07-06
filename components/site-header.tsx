@@ -10,7 +10,7 @@ export async function SiteHeader() {
   } = await supabase.auth.getUser()
 
   let displayName: string | null = null
-  let isAdmin = false
+  let showAdmin = false
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
@@ -18,7 +18,7 @@ export async function SiteHeader() {
       .eq("user_id", user.id)
       .maybeSingle()
     displayName = profile?.display_name ?? user.email ?? null
-    isAdmin = profile?.role === "admin"
+    showAdmin = profile?.role === "admin" || profile?.role === "brand_admin"
   }
 
   return (
@@ -31,13 +31,21 @@ export async function SiteHeader() {
           Bean<span className="text-primary">·</span>Rater
         </Link>
         <div className="flex items-center gap-2 min-w-0">
-          {isAdmin && (
+          {showAdmin && (
             <Button nativeButton={false} render={<Link href="/admin" />} variant="ghost" size="sm">
               Admin
             </Button>
           )}
           {user ? (
             <>
+              <Button
+                nativeButton={false}
+                render={<Link href="/dashboard" />}
+                variant="ghost"
+                size="sm"
+              >
+                My recipes
+              </Button>
               <span className="hidden sm:block text-xs text-muted-foreground truncate max-w-40">
                 {displayName}
               </span>

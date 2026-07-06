@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Link from "next/link"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import { SiteHeader } from "@/components/site-header"
 import "./globals.css"
@@ -38,9 +39,17 @@ export default function RootLayout({
           {children}
         </main>
         <footer className="border-t py-6">
-          <p className="max-w-3xl mx-auto px-4 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-            Bean Rater — community brew data
-          </p>
+          <div className="max-w-3xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+            <p>Bean Rater — community brew data</p>
+            <nav className="flex gap-4">
+              <Link href="/privacy" className="hover:text-foreground">
+                Privacy
+              </Link>
+              <Link href="/terms" className="hover:text-foreground">
+                Terms
+              </Link>
+            </nav>
+          </div>
         </footer>
       </body>
     </html>
