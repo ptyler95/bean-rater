@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Inter, JetBrains_Mono } from "next/font/google"
 import { SiteHeader } from "@/components/site-header"
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
 const inter = Inter({
@@ -42,6 +43,7 @@ export default function RootLayout({
             Bean Rater — community brew data
           </p>
         </footer>
+        <Analytics />
       </body>
     </html>
   )
