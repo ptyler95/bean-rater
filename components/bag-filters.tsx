@@ -29,7 +29,7 @@ export function BagFilters({
     else params.delete(key)
     params.delete("page") // any filter/sort change restarts at page 1
     const qs = params.toString()
-    router.push(qs ? `/?${qs}` : "/", { scroll: false })
+    router.push(qs ? `/bags?${qs}` : "/bags", { scroll: false })
   }
 
   return (

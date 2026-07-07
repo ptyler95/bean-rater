@@ -21,7 +21,7 @@ export function Pager({
     }
     if (target > 1) params.set("page", String(target))
     const qs = params.toString()
-    return qs ? `/?${qs}` : "/"
+    return qs ? `/bags?${qs}` : "/bags"
   }
 
   const linkClass = buttonVariants({ variant: "outline", size: "sm" })

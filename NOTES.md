@@ -133,6 +133,25 @@ and what's left for a real launch.
   are reverted by the guard trigger unless the caller is an admin; SQL-editor
   and service contexts (no `auth.uid()`) bypass the guard.
 
+## Marketing homepage + "fresh crop" restyle (added 2026-07-07, post-launch)
+
+- The bag directory moved from `/` to `/bags`; `/` is now a marketing/community
+  homepage (mission pitch, live stats, 5 newest recipes, most-reviewed bag,
+  CTA to `/bags`). `BagFilters` and `Pager` write `/bags?…` URLs now.
+- Content routes live in the `app/(shell)/` route group, which applies the
+  shared `max-w-4xl` container; the homepage lays out its own full-width
+  sections. `app/auth` stayed outside the group (no UI, and `@/app/auth/actions`
+  is imported elsewhere).
+- Restyle modeled on the Figma Sites "Modern Product Launch" template the user
+  picked (green = green coffee bean / freshness): pale-sage background, deep
+  olive `--primary`, sage `--secondary`/`--accent`, Instrument Serif as
+  `--font-heading` for display headings (400-only — `.font-heading` pins
+  `font-weight: 400`), pill buttons (`rounded-full` in `ui/button.tsx`),
+  `--radius` 0.375 → 0.625rem, wider header/footer (`max-w-6xl`).
+- Homepage stats are live counts (recipes/bags/brands, RLS-filtered); the
+  featured bag reuses `browse_bags` with `most_recipes`/page-size 1. No new
+  migrations.
+
 ## To make yourself admin
 
 After you first sign in (magic link), run in the Supabase SQL editor:

@@ -23,13 +23,20 @@ export async function SiteHeader() {
 
   return (
     <header className="border-b bg-background/95 sticky top-0 z-40 backdrop-blur-sm">
-      <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-        <Link
-          href="/"
-          className="font-mono text-sm font-bold uppercase tracking-[0.2em]"
-        >
-          Bean<span className="text-primary">·</span>Rater
-        </Link>
+      <div className="mx-auto w-full max-w-6xl px-5 h-16 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-8 min-w-0">
+          <Link href="/" className="font-heading text-2xl tracking-tight">
+            Bean Rater
+          </Link>
+          <nav className="hidden sm:flex items-center gap-6 text-sm text-muted-foreground">
+            <Link href="/bags" className="hover:text-foreground">
+              Browse
+            </Link>
+            <Link href="/bags/new" className="hover:text-foreground">
+              Add a bag
+            </Link>
+          </nav>
+        </div>
         <div className="flex items-center gap-2 min-w-0">
           {showAdmin && (
             <Button nativeButton={false} render={<Link href="/admin" />} variant="ghost" size="sm">

@@ -1,12 +1,18 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { Inter, JetBrains_Mono } from "next/font/google"
+import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google"
 import { SiteHeader } from "@/components/site-header"
 import "./globals.css"
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+})
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
 })
 
 const jetbrainsMono = JetBrains_Mono({
@@ -31,17 +37,21 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <SiteHeader />
-        <main className="flex-1 w-full max-w-3xl mx-auto px-4 pb-16">
-          {children}
-        </main>
-        <footer className="border-t py-6">
-          <div className="max-w-3xl mx-auto px-4 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-            <p>Bean Rater — community brew data</p>
-            <nav className="flex gap-4">
+        <main className="flex-1 w-full">{children}</main>
+        <footer className="border-t py-10">
+          <div className="mx-auto w-full max-w-6xl px-5 flex flex-wrap items-center justify-between gap-4">
+            <p className="font-heading text-lg">Bean Rater</p>
+            <nav className="flex gap-6 text-sm text-muted-foreground">
+              <Link href="/bags" className="hover:text-foreground">
+                Browse
+              </Link>
+              <Link href="/bags/new" className="hover:text-foreground">
+                Add a bag
+              </Link>
               <Link href="/privacy" className="hover:text-foreground">
                 Privacy
               </Link>
