@@ -152,6 +152,21 @@ and what's left for a real launch.
   featured bag reuses `browse_bags` with `most_recipes`/page-size 1. No new
   migrations.
 
+## Real data import (added 2026-07-07)
+
+- `supabase/cleanup_and_real_data.sql` — paste into the Supabase SQL editor.
+  Deletes the demo seed (5 demo users, 4 fake brands, 13 bags, 30 recipes;
+  keeps the Archive sentinel and real accounts) and inserts 6 real brands
+  with 18 bags: Metric Coffee, Onyx Coffee Lab, Dekáf Coffee Roasters,
+  Counter Culture, Intelligentsia, Verve. Facts transcribed from roaster
+  product pages on 2026-07-07; unpublished fields (altitude, blend
+  varietals) left null; multi-process blends pick the defining component's
+  enum value. No recipes seeded — ratings should come from real submissions,
+  so consensus cards start empty. Bags are `community_verified` and
+  attributed to ptyler95@gmail.com if that account exists, else Archive.
+  Idempotent (fixed UUIDs + `on conflict do nothing`); verified end-to-end
+  against a local Postgres 16 mimic of the schema.
+
 ## To make yourself admin
 
 After you first sign in (magic link), run in the Supabase SQL editor:
