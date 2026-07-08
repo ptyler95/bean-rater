@@ -39,9 +39,9 @@ export default async function BrowseBagsPage({
   const supabase = await createClient()
   const [{ data: bags }, { data: brands }] = await Promise.all([
     supabase.rpc("browse_bags", {
-      p_brand_slug: params.brand || null,
-      p_brew_method: method as Enums<"brew_method"> | null,
-      p_roast_level: roast as Enums<"roast_level"> | null,
+      p_brand_slug: params.brand || undefined,
+      p_brew_method: (method ?? undefined) as Enums<"brew_method"> | undefined,
+      p_roast_level: (roast ?? undefined) as Enums<"roast_level"> | undefined,
       p_sort: sort,
       p_page: page,
       p_page_size: PAGE_SIZE,

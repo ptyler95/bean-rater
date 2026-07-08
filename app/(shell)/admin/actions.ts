@@ -10,6 +10,7 @@ import { Constants, type Enums } from "@/lib/database.types"
 function revalidateBag(bagId: string) {
   revalidatePath("/admin")
   revalidatePath(`/bags/${bagId}`)
+  revalidatePath("/bags")
   revalidatePath("/")
 }
 
@@ -55,6 +56,7 @@ export async function deleteBag(formData: FormData) {
   const supabase = await createClient()
   await supabase.from("bags").delete().eq("id", bagId)
   revalidatePath("/admin")
+  revalidatePath("/bags")
   revalidatePath("/")
 }
 
@@ -63,7 +65,7 @@ export async function assignBrandAdmin(
   formData: FormData
 ): Promise<{ ok?: boolean; error?: string }> {
   const email = (formData.get("email") as string)?.trim()
-  const brandSlug = (formData.get("brand_slug") as string) || null
+  const brandSlug = (formData.get("brand_slug") as string) || undefined
   if (!email) return { error: "Email is required." }
 
   const supabase = await createClient()
@@ -76,13 +78,62 @@ export async function assignBrandAdmin(
   return { ok: true }
 }
 
+export async function resolveBrandClaim(formData: FormData) {
+  const claimId = formData.get("claim_id") as string
+  const approve = formData.get("approve") === "true"
+  const brandSlug = formData.get("brand_slug") as string
+  if (!claimId) return
+
+  const supabase = await createClient()
+  await supabase.rpc("resolve_brand_claim", {
+    p_claim_id: claimId,
+    p_approve: approve,
+  })
+  revalidatePath("/admin")
+  if (brandSlug) revalidatePath(`/roasters/${brandSlug}`)
+}
+
+export async function updateBrandProfile(
+  _prev: { ok?: boolean; error?: string } | null,
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  const brandId = formData.get("brand_id") as string
+  const brandSlug = formData.get("brand_slug") as string
+  const description = ((formData.get("description") as string) ?? "").trim()
+  const website = ((formData.get("website") as string) ?? "").trim()
+  const logoUrl = ((formData.get("logo_url") as string) ?? "").trim()
+  if (!brandId) return { error: "Missing brand." }
+  if (description.length > 600) {
+    return { error: "Description must be 600 characters or fewer." }
+  }
+  for (const [label, url] of [
+    ["Website", website],
+    ["Logo URL", logoUrl],
+  ] as const) {
+    if (url && !/^https?:\/\//i.test(url)) {
+      return { error: `${label} must be an http(s) URL.` }
+    }
+  }
+
+  const supabase = await createClient()
+  // Blank strings clear the fields; the RPC nullifs them server-side.
+  const { error } = await supabase.rpc("update_brand_profile", {
+    p_brand_id: brandId,
+    p_description: description,
+    p_website: website,
+    p_logo_url: logoUrl,
+  })
+  if (error) return { error: error.message }
+  revalidatePath("/admin")
+  if (brandSlug) revalidatePath(`/roasters/${brandSlug}`)
+  return { ok: true }
+}
+
 export async function revokeBrandAdmin(formData: FormData) {
   const email = formData.get("email") as string
   if (!email) return
   const supabase = await createClient()
-  await supabase.rpc("assign_brand_admin", {
-    p_email: email,
-    p_brand_slug: null,
-  })
+  // Omitting p_brand_slug demotes back to a regular user.
+  await supabase.rpc("assign_brand_admin", { p_email: email })
   revalidatePath("/admin")
 }

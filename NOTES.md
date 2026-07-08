@@ -1,4 +1,4 @@
-# Bean Rater — build notes
+# Grounded (formerly Bean Rater) — build notes
 
 Decisions made autonomously during the build, deviations from the spec and why,
 and what's left for a real launch.
@@ -151,6 +151,54 @@ and what's left for a real launch.
 - Homepage stats are live counts (recipes/bags/brands, RLS-filtered); the
   featured bag reuses `browse_bags` with `most_recipes`/page-size 1. No new
   migrations.
+
+## Launch-week pass (2026-07-07): security review, roaster pages, claims, SEO
+
+- **Security review fixes** (`20260707150000_security_hardening_2.sql` + fix):
+  - Profiles own-update policy now locks `brand_id` as well as `role` — a
+    brand admin could previously reassign themselves to any brand.
+  - The moderation guard trigger also reverts `verification_status →
+    community_verified` and `added_by` changes by non-admins (brand admins
+    could self-grant the community badge / spoof attribution).
+  - `/auth/confirm` sanitizes `next` (same-site paths only — was an open
+    redirect); `sendMagicLink` no longer throws on a missing Origin header.
+  - Users can rename their public display name from `/dashboard` (the signup
+    default is the email local-part, which is publicly visible on recipes).
+  - HSTS header added. Advisor WARNs on `is_admin`/`is_brand_admin_for`
+    anon-execute remain intentional (RLS policies evaluate them as the
+    querying role); all SECURITY DEFINER RPCs re-audited — each gates
+    internally. All fixes verified with impersonation probes run in
+    rolled-back transactions.
+- **Roaster pages**: `/roasters` index + `/roasters/[slug]` (stats, catalog
+  via `browse_bags`, claim CTA), backed by `browse_roasters(p_slug)` RPC;
+  `brands.description` added; bag detail brand name and header/footer nav
+  link to roaster pages; `Pager` gained a `basePath` prop.
+- **Claim flow**: `brand_claims` table + `request/list/resolve_brand_claim`
+  and `update_brand_profile` RPCs (all SECURITY DEFINER, internally gated,
+  writes via RPC only). Claim form on the roaster page; approve/reject queue
+  and brand-profile editor in `/admin`; brand admins see "My roaster" in the
+  header and a "View public page" link. Approval is manual; claimants are
+  capped at 3 pending claims, one per brand.
+- **RPC arg convention**: optional/nullable RPC args now have SQL `default
+  null` so the generated TS types mark them optional — omit rather than pass
+  null (`assign_brand_admin` demotes when the slug is omitted).
+- **SEO**: `lib/site.ts` centralizes SITE_NAME (rename = one constant +
+  copy), `metadataBase` + OG/twitter defaults, per-bag and per-roaster
+  `generateMetadata`, dynamic OG images (`opengraph-image.tsx` for home,
+  bags, roasters), `app/sitemap.ts`, `app/robots.ts`.
+- **Deploy prep**: `(shell)/error.tsx` + root `not-found.tsx`, Vercel
+  Analytics in the root layout, `.env.example`. Duplicate "Metric Coffee"
+  brand merged (5 bags under `metric-coffee`).
+- Set `NEXT_PUBLIC_SITE_URL` in Vercel once the domain exists (sitemap/OG
+  URLs fall back to `VERCEL_URL`).
+
+## Rebrand (2026-07-07)
+
+- Renamed Bean Rater → **Grounded**, production domain **groundbeans.com**
+  (hardcoded fallback in `lib/site.ts` for Vercel production; override with
+  `NEXT_PUBLIC_SITE_URL`). Legal-page contact is preston@namelessconsulting.com.
+- The `@beanrater.local` sentinel/archive email domain is unchanged —
+  unroutable and invisible to users; not worth a data migration.
 
 ## To make yourself admin
 

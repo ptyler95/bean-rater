@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
 import { SiteHeader } from "@/components/site-header"
+import { SITE_NAME, SITE_DESCRIPTION, siteUrl } from "@/lib/site"
 import "./globals.css"
 
 const inter = Inter({
@@ -21,12 +23,20 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: {
-    default: "Bean Rater",
-    template: "%s · Bean Rater",
+    default: SITE_NAME,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    "Community brew recipes for specific bags of coffee. Doses, temps, and times — not vibes.",
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    siteName: SITE_NAME,
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 }
 
 export default function RootLayout({
@@ -44,10 +54,13 @@ export default function RootLayout({
         <main className="flex-1 w-full">{children}</main>
         <footer className="border-t py-10">
           <div className="mx-auto w-full max-w-6xl px-5 flex flex-wrap items-center justify-between gap-4">
-            <p className="font-heading text-lg">Bean Rater</p>
+            <p className="font-heading text-lg">{SITE_NAME}</p>
             <nav className="flex gap-6 text-sm text-muted-foreground">
               <Link href="/bags" className="hover:text-foreground">
                 Browse
+              </Link>
+              <Link href="/roasters" className="hover:text-foreground">
+                Roasters
               </Link>
               <Link href="/bags/new" className="hover:text-foreground">
                 Add a bag
@@ -61,6 +74,7 @@ export default function RootLayout({
             </nav>
           </div>
         </footer>
+        <Analytics />
       </body>
     </html>
   )

@@ -53,6 +53,7 @@ export async function createBag(
 
   if (error) return { error: error.message }
 
+  revalidatePath("/bags")
   revalidatePath("/")
   redirect(`/bags/${bag.id}`)
 }

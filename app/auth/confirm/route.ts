@@ -10,7 +10,10 @@ export async function GET(request: Request) {
   const code = searchParams.get("code")
   const tokenHash = searchParams.get("token_hash")
   const type = searchParams.get("type") as EmailOtpType | null
-  const next = searchParams.get("next") ?? "/"
+  // Same-site paths only — an absolute or protocol-relative `next`
+  // would turn this callback into an open redirect.
+  const rawNext = searchParams.get("next") ?? "/"
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/"
 
   const supabase = await createClient()
 

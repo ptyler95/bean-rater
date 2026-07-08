@@ -1,7 +1,7 @@
 export const metadata = { title: "Terms of Service" }
 
 const EFFECTIVE_DATE = "July 6, 2026"
-const CONTACT_EMAIL = "ptyler95@gmail.com"
+const CONTACT_EMAIL = "preston@namelessconsulting.com"
 
 export default function TermsPage() {
   return (
@@ -16,7 +16,7 @@ export default function TermsPage() {
       <section className="space-y-2">
         <h2 className="font-semibold">The service</h2>
         <p>
-          Bean Rater is a community database of coffee brewing recipes tied to
+          Grounded is a community database of coffee brewing recipes tied to
           specific bags of coffee. Recipes and aggregate statistics are
           community-submitted opinions about taste — not professional advice,
           and not guaranteed to be accurate or safe for your equipment.
@@ -27,7 +27,7 @@ export default function TermsPage() {
         <h2 className="font-semibold">Your account and content</h2>
         <p>
           You&apos;re responsible for activity under your account. By
-          submitting recipes, bags, brands, or notes, you grant Bean Rater a
+          submitting recipes, bags, brands, or notes, you grant Grounded a
           perpetual, worldwide, royalty-free license to display, aggregate, and
           adapt that content as part of the service (including in
           &ldquo;community recipe&rdquo; statistics). Submit only content you
@@ -55,7 +55,7 @@ export default function TermsPage() {
         <h2 className="font-semibold">Disclaimers</h2>
         <p>
           The service is provided &ldquo;as is&rdquo; without warranties of any
-          kind. To the maximum extent permitted by law, Bean Rater is not
+          kind. To the maximum extent permitted by law, Grounded is not
           liable for indirect or consequential damages arising from use of the
           service, and total liability is limited to the amount you paid us
           (currently: nothing).

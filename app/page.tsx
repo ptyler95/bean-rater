@@ -57,9 +57,6 @@ export default async function HomePage() {
       .order("created_at", { ascending: false })
       .limit(5),
     supabase.rpc("browse_bags", {
-      p_brand_slug: null,
-      p_brew_method: null,
-      p_roast_level: null,
       p_sort: "most_recipes",
       p_page: 1,
       p_page_size: 1,
@@ -86,7 +83,7 @@ export default async function HomePage() {
           Enjoy your beans more.
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Bean Rater is the community home for brew recipes tied to specific
+          Grounded is the community home for brew recipes tied to specific
           bags of coffee. Whether you just picked up a new bag or you&apos;re
           hunting for the next one, start from doses, temps, and times that
           other people have already worked out — and spend your mornings

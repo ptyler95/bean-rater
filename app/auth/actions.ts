@@ -13,14 +13,20 @@ export async function sendMagicLink(
   if (!email) return { error: "Enter your email address." }
 
   const headerList = await headers()
-  const origin = headerList.get("origin") ?? headerList.get("referer") ?? ""
+  const originHeader = headerList.get("origin") ?? headerList.get("referer")
+  let redirectTo: string | undefined
+  try {
+    if (originHeader) {
+      redirectTo = `${new URL(originHeader).origin}/auth/confirm?next=${encodeURIComponent(next)}`
+    }
+  } catch {
+    // Malformed header — omit emailRedirectTo and let Supabase use the Site URL.
+  }
   const supabase = await createClient()
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: {
-      emailRedirectTo: `${new URL(origin).origin}/auth/confirm?next=${encodeURIComponent(next)}`,
-    },
+    options: { emailRedirectTo: redirectTo },
   })
 
   if (error) return { error: error.message }

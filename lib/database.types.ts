@@ -62,7 +62,7 @@ export type Database = {
           verification_status: Database["public"]["Enums"]["verification_status"]
         }
         Insert: {
-          added_by: string
+          added_by?: string
           altitude_masl?: number | null
           bag_size?: string | null
           brand_id: string
@@ -111,11 +111,53 @@ export type Database = {
           },
         ]
       }
+      brand_claims: {
+        Row: {
+          brand_id: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          message: string
+          status: Database["public"]["Enums"]["claim_status"]
+          user_id: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          message: string
+          status?: Database["public"]["Enums"]["claim_status"]
+          user_id: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          message?: string
+          status?: Database["public"]["Enums"]["claim_status"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_claims_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brands: {
         Row: {
           claimed: boolean
           claimed_by: string | null
           created_at: string
+          description: string | null
           id: string
           logo_url: string | null
           name: string
@@ -127,6 +169,7 @@ export type Database = {
           claimed?: boolean
           claimed_by?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           logo_url?: string | null
           name: string
@@ -138,6 +181,7 @@ export type Database = {
           claimed?: boolean
           claimed_by?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           logo_url?: string | null
           name?: string
@@ -225,7 +269,7 @@ export type Database = {
           notes?: string | null
           rating: number
           updated_at?: string
-          user_id: string
+          user_id?: string
           water_ml?: number | null
           water_temp_c: number
           yield_g?: number | null
@@ -274,6 +318,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_brand_admin: {
+        Args: { p_brand_slug?: string; p_email: string }
+        Returns: undefined
+      }
       bag_method_consensus: {
         Args: { p_bag_id: string }
         Returns: {
@@ -290,44 +338,76 @@ export type Database = {
       }
       browse_bags: {
         Args: {
-          p_brand_slug?: string | null
-          p_brew_method?: Database["public"]["Enums"]["brew_method"] | null
-          p_roast_level?: Database["public"]["Enums"]["roast_level"] | null
-          p_sort?: string
+          p_brand_slug?: string
+          p_brew_method?: Database["public"]["Enums"]["brew_method"]
           p_page?: number
           p_page_size?: number
+          p_roast_level?: Database["public"]["Enums"]["roast_level"]
+          p_sort?: string
         }
         Returns: {
+          avg_rating: number
           bag_id: string
-          coffee_name: string
-          origin: string
-          roast_level: Database["public"]["Enums"]["roast_level"]
-          process: Database["public"]["Enums"]["process_method"]
-          verification_status: Database["public"]["Enums"]["verification_status"]
           brand_name: string
           brand_slug: string
-          recipe_count: number
-          avg_rating: number | null
+          coffee_name: string
           created_at: string
+          origin: string
+          process: Database["public"]["Enums"]["process_method"]
+          recipe_count: number
+          roast_level: Database["public"]["Enums"]["roast_level"]
           total_count: number
+          verification_status: Database["public"]["Enums"]["verification_status"]
         }[]
       }
-      assign_brand_admin: {
-        Args: { p_email: string; p_brand_slug: string | null }
-        Returns: undefined
+      browse_roasters: {
+        Args: { p_slug?: string }
+        Returns: {
+          avg_rating: number
+          bag_count: number
+          brand_id: string
+          claimed: boolean
+          description: string
+          logo_url: string
+          name: string
+          recipe_count: number
+          slug: string
+          website: string
+        }[]
       }
       find_or_create_brand: { Args: { p_name: string }; Returns: string }
+      is_admin: { Args: never; Returns: boolean }
       is_brand_admin_for: { Args: { p_brand_id: string }; Returns: boolean }
       list_brand_admins: {
         Args: never
         Returns: {
+          brand_name: string
+          brand_slug: string
+          display_name: string
           email: string
-          display_name: string | null
-          brand_name: string | null
-          brand_slug: string | null
         }[]
       }
-      is_admin: { Args: never; Returns: boolean }
+      list_brand_claims: {
+        Args: never
+        Returns: {
+          brand_name: string
+          brand_slug: string
+          brand_website: string
+          claim_id: string
+          claimant_email: string
+          claimant_name: string
+          created_at: string
+          message: string
+        }[]
+      }
+      request_brand_claim: {
+        Args: { p_brand_id: string; p_message: string }
+        Returns: undefined
+      }
+      resolve_brand_claim: {
+        Args: { p_approve: boolean; p_claim_id: string }
+        Returns: undefined
+      }
       search_bags: {
         Args: { q: string }
         Returns: {
@@ -343,8 +423,15 @@ export type Database = {
           verification_status: Database["public"]["Enums"]["verification_status"]
         }[]
       }
-      show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
+      update_brand_profile: {
+        Args: {
+          p_brand_id: string
+          p_description?: string
+          p_logo_url?: string
+          p_website?: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       brew_method:
@@ -355,6 +442,7 @@ export type Database = {
         | "moka_pot"
         | "cold_brew"
         | "batch"
+      claim_status: "pending" | "approved" | "rejected"
       freshness_offset: "under_7" | "7_to_14" | "14_to_21" | "over_21"
       grind_category:
         | "extra_fine"
@@ -507,6 +595,7 @@ export const Constants = {
         "cold_brew",
         "batch",
       ],
+      claim_status: ["pending", "approved", "rejected"],
       freshness_offset: ["under_7", "7_to_14", "14_to_21", "over_21"],
       grind_category: [
         "extra_fine",

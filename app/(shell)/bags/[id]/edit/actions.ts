@@ -42,6 +42,7 @@ export async function updateBag(
 
   revalidatePath(`/bags/${bagId}`)
   revalidatePath("/admin")
+  revalidatePath("/bags")
   revalidatePath("/")
   redirect(`/bags/${bagId}`)
 }

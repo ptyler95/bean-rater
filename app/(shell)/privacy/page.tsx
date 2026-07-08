@@ -1,7 +1,7 @@
 export const metadata = { title: "Privacy Policy" }
 
 const EFFECTIVE_DATE = "July 6, 2026"
-const CONTACT_EMAIL = "ptyler95@gmail.com"
+const CONTACT_EMAIL = "preston@namelessconsulting.com"
 
 export default function PrivacyPage() {
   return (
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
       <section className="space-y-2">
         <h2 className="font-semibold">Who else touches your data</h2>
         <p>
-          Bean Rater runs on Supabase (database and authentication, hosted in
+          Grounded runs on Supabase (database and authentication, hosted in
           the United States) and Vercel (web hosting). Sign-in emails are
           delivered through our email provider. These processors store data on
           our behalf and are not permitted to use it for their own purposes.

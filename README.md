@@ -1,6 +1,6 @@
-# Bean Rater
+# Grounded
 
-Community brew recipes for specific bags of coffee. Look up a bag, see the
+**groundbeans.com** — community brew recipes for specific bags of coffee. Look up a bag, see the
 consensus recipe per brew method (once 3+ people have submitted), or log your
 own — doses, temps, and times, not vibes.
 

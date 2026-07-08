@@ -7,10 +7,12 @@ export function Pager({
   page,
   totalPages,
   searchParams,
+  basePath = "/bags",
 }: {
   page: number
   totalPages: number
   searchParams: Record<string, string | undefined>
+  basePath?: string
 }) {
   if (totalPages <= 1) return null
 
@@ -21,7 +23,7 @@ export function Pager({
     }
     if (target > 1) params.set("page", String(target))
     const qs = params.toString()
-    return qs ? `/bags?${qs}` : "/bags"
+    return qs ? `${basePath}?${qs}` : basePath
   }
 
   const linkClass = buttonVariants({ variant: "outline", size: "sm" })

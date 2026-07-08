@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
 import { VerificationBadge } from "@/components/verification-badge"
@@ -7,6 +8,32 @@ import { StatBlock } from "@/components/stat-block"
 import { MethodTabs } from "./method-tabs"
 import { FlagButton } from "./flag-button"
 import { PROCESS_LABELS, ROAST_LEVEL_LABELS } from "@/lib/labels"
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const supabase = await createClient()
+  const [{ data: bag }, { count }] = await Promise.all([
+    supabase
+      .from("bags")
+      .select("coffee_name, origin, roast_level, brands(name)")
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("recipes")
+      .select("*", { count: "exact", head: true })
+      .eq("bag_id", id),
+  ])
+  if (!bag) return { title: "Bag not found" }
+  const recipes = count ?? 0
+  return {
+    title: `${bag.coffee_name} — ${bag.brands?.name}`,
+    description: `${recipes} community brew ${recipes === 1 ? "recipe" : "recipes"} for ${bag.brands?.name} ${bag.coffee_name} (${bag.origin}, ${ROAST_LEVEL_LABELS[bag.roast_level]} roast) — doses, temps, and times per brew method.`,
+  }
+}
 
 export default async function BagPage({
   params,
@@ -60,7 +87,14 @@ export default async function BagPage({
       <header className="space-y-4">
         <div className="space-y-1">
           <p className="text-[11px] uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-            {bag.brands?.name}
+            {bag.brands ? (
+              <Link
+                href={`/roasters/${bag.brands.slug}`}
+                className="hover:text-foreground underline-offset-2 hover:underline"
+              >
+                {bag.brands.name}
+              </Link>
+            ) : null}
             <VerificationBadge status={bag.verification_status} />
           </p>
           <h1 className="text-2xl font-semibold tracking-tight">

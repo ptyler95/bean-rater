@@ -6,6 +6,7 @@ import { RatingDots } from "@/components/rating-dots"
 import { BREW_METHOD_LABELS } from "@/lib/labels"
 import { fmtNum, fmtTime } from "@/lib/format"
 import { deleteRecipe } from "./actions"
+import { DisplayNameForm } from "./display-name-form"
 
 export const metadata = { title: "My recipes" }
 
@@ -24,8 +25,25 @@ export default async function DashboardPage() {
 
   const rows = recipes ?? []
 
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("user_id", user.id)
+    .maybeSingle()
+
   return (
-    <div className="pt-8 space-y-4">
+    <div className="pt-8 space-y-8">
+      <section className="space-y-2">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+          Display name
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          Shown publicly on your recipes.
+        </p>
+        <DisplayNameForm current={profile?.display_name ?? ""} />
+      </section>
+
+      <div className="space-y-4">
       <header className="flex items-baseline justify-between gap-2">
         <h1 className="text-lg font-semibold">My recipes</h1>
         <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
@@ -79,6 +97,7 @@ export default async function DashboardPage() {
           ))}
         </ul>
       )}
+      </div>
     </div>
   )
 }

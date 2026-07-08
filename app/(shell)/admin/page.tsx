@@ -15,11 +15,13 @@ import { VERIFICATION_LABELS } from "@/lib/labels"
 import { Constants } from "@/lib/database.types"
 import {
   deleteBag,
+  resolveBrandClaim,
   revokeBrandAdmin,
   setBagHidden,
   setBagVerification,
 } from "./actions"
 import { AssignBrandAdminForm } from "./assign-form"
+import { BrandProfileForm } from "./brand-profile-form"
 
 export const metadata = { title: "Admin" }
 
@@ -43,7 +45,7 @@ export default async function AdminPage({
   const { data: profile } = user
     ? await supabase
         .from("profiles")
-        .select("role, brand_id, brands(name)")
+        .select("role, brand_id, brands(id, name, slug, description, website, logo_url)")
         .eq("user_id", user.id)
         .maybeSingle()
     : { data: null }
@@ -73,13 +75,16 @@ export default async function AdminPage({
   if (view === "hidden") query = query.eq("flagged", true)
   if (view === "reported") query = query.gt("flag_count", 0)
 
-  const [{ data: bags }, { data: brands }, brandAdmins] = await Promise.all([
-    query,
-    isAdmin
-      ? supabase.from("brands").select("name, slug").order("name")
-      : Promise.resolve({ data: null }),
-    isAdmin ? supabase.rpc("list_brand_admins") : Promise.resolve({ data: null }),
-  ])
+  const [{ data: bags }, { data: brands }, brandAdmins, claims] =
+    await Promise.all([
+      query,
+      isAdmin
+        ? supabase.from("brands").select("name, slug").order("name")
+        : Promise.resolve({ data: null }),
+      isAdmin ? supabase.rpc("list_brand_admins") : Promise.resolve({ data: null }),
+      isAdmin ? supabase.rpc("list_brand_claims") : Promise.resolve({ data: null }),
+    ])
+  const pendingClaims = claims?.data ?? []
 
   return (
     <div className="pt-8 space-y-8">
@@ -95,9 +100,17 @@ export default async function AdminPage({
           </p>
         </div>
         {isBrandAdmin && (
-          <Button nativeButton={false} render={<Link href="/bags/new" />} size="sm">
-            Add bag
-          </Button>
+          <span className="flex items-center gap-3">
+            <Link
+              href={`/roasters/${profile?.brands?.slug}`}
+              className="text-xs text-muted-foreground underline underline-offset-2"
+            >
+              View public page →
+            </Link>
+            <Button nativeButton={false} render={<Link href="/bags/new" />} size="sm">
+              Add bag
+            </Button>
+          </span>
         )}
       </header>
 
@@ -219,6 +232,72 @@ export default async function AdminPage({
             </TableBody>
           </Table>
         </div>
+      )}
+
+      {/* Brand profile (brand admins manage their public roaster page) */}
+      {isBrandAdmin && profile?.brands && (
+        <section className="space-y-3 border-t pt-6">
+          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Roaster profile
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Shown on your public page at /roasters/{profile.brands.slug}.
+          </p>
+          <BrandProfileForm brand={profile.brands} />
+        </section>
+      )}
+
+      {/* Claim requests (full admins only) */}
+      {isAdmin && pendingClaims.length > 0 && (
+        <section className="space-y-3 border-t pt-6">
+          <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            Claim requests
+          </h2>
+          <ul className="divide-y rounded-md border bg-card">
+            {pendingClaims.map((c) => (
+              <li key={c.claim_id} className="px-4 py-3 space-y-2">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="text-sm font-medium">
+                    {c.brand_name}
+                    <span className="text-muted-foreground font-normal">
+                      {" "}
+                      claimed by {c.claimant_name ?? "—"} ({c.claimant_email})
+                    </span>
+                  </span>
+                  {c.brand_website && (
+                    <a
+                      href={c.brand_website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-muted-foreground underline underline-offset-2"
+                    >
+                      {c.brand_website}
+                    </a>
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">{c.message}</p>
+                <div className="flex gap-2">
+                  <form action={resolveBrandClaim}>
+                    <input type="hidden" name="claim_id" value={c.claim_id} />
+                    <input type="hidden" name="approve" value="true" />
+                    <input type="hidden" name="brand_slug" value={c.brand_slug} />
+                    <Button type="submit" size="xs">
+                      Approve
+                    </Button>
+                  </form>
+                  <form action={resolveBrandClaim}>
+                    <input type="hidden" name="claim_id" value={c.claim_id} />
+                    <input type="hidden" name="approve" value="false" />
+                    <input type="hidden" name="brand_slug" value={c.brand_slug} />
+                    <Button type="submit" variant="outline" size="xs">
+                      Reject
+                    </Button>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       {/* Brand admin management (full admins only) */}
