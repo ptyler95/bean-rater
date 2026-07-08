@@ -194,7 +194,7 @@ and what's left for a real launch.
 
 ## Rebrand (2026-07-07)
 
-- Renamed Bean Rater → **Grounded**, production domain **groundbeans.com**
+- Renamed Bean Rater → **Grounded**, production domain **groundedbeans.com**
   (hardcoded fallback in `lib/site.ts` for Vercel production; override with
   `NEXT_PUBLIC_SITE_URL`). Legal-page contact is preston@namelessconsulting.com.
 - The `@beanrater.local` sentinel/archive email domain is unchanged —

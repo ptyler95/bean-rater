@@ -5,10 +5,10 @@ export const SITE_NAME = "Grounded"
 export const SITE_DESCRIPTION =
   "Community brew recipes for specific bags of coffee. Doses, temps, and times — not vibes."
 
-/** Absolute origin for metadata and OG URLs. Production: groundbeans.com. */
+/** Absolute origin for metadata and OG URLs. Production: groundedbeans.com. */
 export function siteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL
-  if (process.env.VERCEL_ENV === "production") return "https://groundbeans.com"
+  if (process.env.VERCEL_ENV === "production") return "https://groundedbeans.com"
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
   return "http://localhost:3000"
 }
