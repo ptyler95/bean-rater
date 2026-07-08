@@ -46,14 +46,24 @@ export default async function HomePage() {
     { data: recentRecipes },
     { data: featuredRows },
   ] = await Promise.all([
-    supabase.from("recipes").select("*", { count: "exact", head: true }),
-    supabase.from("bags").select("*", { count: "exact", head: true }),
+    // RLS shows signed-in staff/authors their hidden rows; filter explicitly
+    // so the public numbers are the same for everyone.
+    supabase
+      .from("recipes")
+      .select("*", { count: "exact", head: true })
+      .eq("flagged", false),
+    supabase
+      .from("bags")
+      .select("*", { count: "exact", head: true })
+      .eq("flagged", false),
     supabase.from("brands").select("*", { count: "exact", head: true }),
     supabase
       .from("recipes")
       .select(
         "id, brew_method, rating, dose_g, water_temp_c, brew_time_s, created_at, bag:bags!inner(id, coffee_name, brand:brands(name))"
       )
+      .eq("flagged", false)
+      .eq("bag.flagged", false)
       .order("created_at", { ascending: false })
       .limit(5),
     supabase.rpc("browse_bags", {

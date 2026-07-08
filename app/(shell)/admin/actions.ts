@@ -78,6 +78,84 @@ export async function assignBrandAdmin(
   return { ok: true }
 }
 
+export async function setRecipeHidden(formData: FormData) {
+  const recipeId = formData.get("recipe_id") as string
+  const bagId = formData.get("bag_id") as string
+  const hide = formData.get("hide") === "true"
+  if (!recipeId) return
+  const supabase = await createClient()
+
+  if (hide) {
+    await supabase.from("recipes").update({ flagged: true }).eq("id", recipeId)
+  } else {
+    // Republish with a clean slate, mirroring bag republish.
+    await supabase
+      .from("recipes")
+      .update({ flagged: false, flag_count: 0 })
+      .eq("id", recipeId)
+    await supabase.from("recipe_flags").delete().eq("recipe_id", recipeId)
+  }
+  if (bagId) revalidateBag(bagId)
+  else revalidatePath("/admin")
+}
+
+export async function deleteRecipeAdmin(formData: FormData) {
+  const recipeId = formData.get("recipe_id") as string
+  const bagId = formData.get("bag_id") as string
+  if (!recipeId) return
+  const supabase = await createClient()
+  await supabase.from("recipes").delete().eq("id", recipeId)
+  if (bagId) revalidateBag(bagId)
+  else revalidatePath("/admin")
+}
+
+export async function assignModerator(
+  _prev: { ok?: boolean; error?: string } | null,
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  const email = (formData.get("email") as string)?.trim()
+  if (!email) return { error: "Email is required." }
+
+  const supabase = await createClient()
+  const { error } = await supabase.rpc("assign_moderator", { p_email: email })
+  if (error) return { error: error.message }
+  revalidatePath("/admin")
+  return { ok: true }
+}
+
+export async function revokeModerator(formData: FormData) {
+  const email = formData.get("email") as string
+  if (!email) return
+  const supabase = await createClient()
+  await supabase.rpc("assign_moderator", { p_email: email, p_revoke: true })
+  revalidatePath("/admin")
+}
+
+export async function banUser(
+  _prev: { ok?: boolean; error?: string } | null,
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  const email = (formData.get("email") as string)?.trim()
+  if (!email) return { error: "Email is required." }
+
+  const supabase = await createClient()
+  const { error } = await supabase.rpc("set_user_ban", {
+    p_email: email,
+    p_banned: true,
+  })
+  if (error) return { error: error.message }
+  revalidatePath("/admin")
+  return { ok: true }
+}
+
+export async function unbanUser(formData: FormData) {
+  const email = formData.get("email") as string
+  if (!email) return
+  const supabase = await createClient()
+  await supabase.rpc("set_user_ban", { p_email: email, p_banned: false })
+  revalidatePath("/admin")
+}
+
 export async function resolveBrandClaim(formData: FormData) {
   const claimId = formData.get("claim_id") as string
   const approve = formData.get("approve") === "true"

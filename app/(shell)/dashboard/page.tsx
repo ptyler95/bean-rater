@@ -19,7 +19,7 @@ export default async function DashboardPage() {
 
   const { data: recipes } = await supabase
     .from("recipes")
-    .select("id, bag_id, brew_method, dose_g, brew_time_s, water_temp_c, rating, created_at, bags(coffee_name, brands(name))")
+    .select("id, bag_id, brew_method, dose_g, brew_time_s, water_temp_c, rating, flagged, created_at, bags(coffee_name, brands(name))")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
 
@@ -69,12 +69,19 @@ export default async function DashboardPage() {
           {rows.map((r) => (
             <li key={r.id} className="flex items-center justify-between gap-3 px-4 py-3">
               <div className="min-w-0">
-                <Link
-                  href={`/bags/${r.bag_id}`}
-                  className="text-sm font-medium underline underline-offset-2"
-                >
-                  {r.bags?.brands?.name} — {r.bags?.coffee_name}
-                </Link>
+                <span className="flex items-center gap-2">
+                  <Link
+                    href={`/bags/${r.bag_id}`}
+                    className="text-sm font-medium underline underline-offset-2"
+                  >
+                    {r.bags?.brands?.name} — {r.bags?.coffee_name}
+                  </Link>
+                  {r.flagged && (
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-destructive border border-destructive/40 rounded px-1.5 py-0.5">
+                      Hidden
+                    </span>
+                  )}
+                </span>
                 <p className="text-xs text-muted-foreground font-mono">
                   {BREW_METHOD_LABELS[r.brew_method]} · {fmtNum(r.dose_g)}g ·{" "}
                   {fmtTime(r.brew_time_s)} · {fmtNum(r.water_temp_c)}°C

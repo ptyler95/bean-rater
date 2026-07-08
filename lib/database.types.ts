@@ -111,6 +111,32 @@ export type Database = {
           },
         ]
       }
+      recipe_flags: {
+        Row: {
+          created_at: string
+          recipe_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          recipe_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          recipe_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_flags_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_claims: {
         Row: {
           brand_id: string
@@ -237,6 +263,8 @@ export type Database = {
           burr_type: string | null
           created_at: string
           dose_g: number
+          flag_count: number
+          flagged: boolean
           freshness_offset:
             | Database["public"]["Enums"]["freshness_offset"]
             | null
@@ -259,6 +287,8 @@ export type Database = {
           burr_type?: string | null
           created_at?: string
           dose_g: number
+          flag_count?: number
+          flagged?: boolean
           freshness_offset?:
             | Database["public"]["Enums"]["freshness_offset"]
             | null
@@ -281,6 +311,8 @@ export type Database = {
           burr_type?: string | null
           created_at?: string
           dose_g?: number
+          flag_count?: number
+          flagged?: boolean
           freshness_offset?:
             | Database["public"]["Enums"]["freshness_offset"]
             | null
@@ -375,14 +407,27 @@ export type Database = {
           website: string
         }[]
       }
+      assign_moderator: {
+        Args: { p_email: string; p_revoke?: boolean }
+        Returns: undefined
+      }
       find_or_create_brand: { Args: { p_name: string }; Returns: string }
       is_admin: { Args: never; Returns: boolean }
+      is_superadmin: { Args: never; Returns: boolean }
       is_brand_admin_for: { Args: { p_brand_id: string }; Returns: boolean }
       list_brand_admins: {
         Args: never
         Returns: {
           brand_name: string
           brand_slug: string
+          display_name: string
+          email: string
+        }[]
+      }
+      list_banned_users: {
+        Args: never
+        Returns: {
+          banned_until: string
           display_name: string
           email: string
         }[]
@@ -398,6 +443,13 @@ export type Database = {
           claimant_name: string
           created_at: string
           message: string
+        }[]
+      }
+      list_moderators: {
+        Args: never
+        Returns: {
+          display_name: string
+          email: string
         }[]
       }
       request_brand_claim: {
@@ -422,6 +474,10 @@ export type Database = {
           sim: number
           verification_status: Database["public"]["Enums"]["verification_status"]
         }[]
+      }
+      set_user_ban: {
+        Args: { p_banned: boolean; p_email: string }
+        Returns: undefined
       }
       update_brand_profile: {
         Args: {
@@ -454,7 +510,7 @@ export type Database = {
         | "extra_coarse"
       process_method: "washed" | "natural" | "honey" | "anaerobic" | "other"
       roast_level: "light" | "medium_light" | "medium" | "medium_dark" | "dark"
-      user_role: "user" | "admin" | "brand_admin"
+      user_role: "user" | "admin" | "brand_admin" | "moderator"
       verification_status:
         | "unverified"
         | "community_verified"
@@ -608,7 +664,7 @@ export const Constants = {
       ],
       process_method: ["washed", "natural", "honey", "anaerobic", "other"],
       roast_level: ["light", "medium_light", "medium", "medium_dark", "dark"],
-      user_role: ["user", "admin", "brand_admin"],
+      user_role: ["user", "admin", "brand_admin", "moderator"],
       verification_status: [
         "unverified",
         "community_verified",

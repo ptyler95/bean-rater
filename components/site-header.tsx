@@ -21,7 +21,8 @@ export async function SiteHeader() {
     displayName = profile?.display_name ?? user.email ?? null
     role = profile?.role ?? null
   }
-  const showAdmin = role === "admin" || role === "brand_admin"
+  const showAdmin =
+    role === "admin" || role === "brand_admin" || role === "moderator"
 
   return (
     <header className="border-b bg-background/95 sticky top-0 z-40 backdrop-blur-sm">

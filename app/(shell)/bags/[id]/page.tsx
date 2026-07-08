@@ -147,6 +147,7 @@ export default async function BagPage({
         bagId={bag.id}
         recipes={recipes ?? []}
         consensus={consensus ?? []}
+        viewerId={user?.id ?? null}
       />
 
       <div className="border-t pt-4">

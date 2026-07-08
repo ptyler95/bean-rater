@@ -14,10 +14,12 @@ export function MethodTabs({
   bagId,
   recipes,
   consensus,
+  viewerId,
 }: {
   bagId: string
   recipes: RecipeWithAuthor[]
   consensus: ConsensusRow[]
+  viewerId?: string | null
 }) {
   // Tabs only for methods that have at least one recipe, busiest first.
   const methods = [...consensus].sort(
@@ -90,7 +92,7 @@ export function MethodTabs({
                 {hasConsensus ? "All submissions" : "Submissions (newest first)"}
               </h3>
               {methodRecipes.map((r) => (
-                <RecipeCard key={r.id} recipe={r} />
+                <RecipeCard key={r.id} recipe={r} viewerId={viewerId} />
               ))}
             </div>
           </TabsContent>

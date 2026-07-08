@@ -200,6 +200,38 @@ and what's left for a real launch.
 - The `@beanrater.local` sentinel/archive email domain is unchanged —
   unroutable and invisible to users; not worth a data migration.
 
+## Role hierarchy + moderation (2026-07-08)
+
+- **Roles are now**: `user` → `brand_admin` → `moderator` → `admin` (owner).
+  The existing `admin` value is the superadmin tier; `moderator` was added
+  (two-part migration `20260708100000` + `20260708101000`). `is_admin()`
+  now means admin-or-moderator, so every pre-existing moderation policy
+  granted moderators their powers automatically; new `is_superadmin()`
+  gates role-granting surfaces: both profiles UPDATE policies (critical —
+  otherwise moderators could self-promote), `assign_brand_admin`,
+  `resolve_brand_claim`, `assign_moderator`, `list_moderators`.
+- **Moderators can**: hide/republish/delete bags and recipes, clear flags,
+  set verification, see hidden content, view the claim queue and brand-admin
+  list (read-only), ban/unban users. **Cannot**: assign/revoke any role,
+  decide claims, ban staff, edit other profiles.
+- **Banning**: `set_user_ban(email, banned)` sets `auth.users.banned_until`
+  (2200 = permanent) and deletes the user's sessions; pre-issued access JWTs
+  can persist up to ~1h (accepted). Archive sentinel is unbannable. Content
+  is never touched by a ban.
+- **Recipe flagging** mirrors bags: `recipe_flags` (one per user per recipe),
+  auto-hide at 3, guard trigger, "Report" button on recipe cards (signed-in
+  non-authors). Flagged recipes are excluded from RLS public reads,
+  `bag_method_consensus`, `browse_bags`, `browse_roasters`, `search_bags`,
+  `profiles.recipe_count`, and the homepage stats; authors see their own
+  with a "hidden pending review" notice (bag page + dashboard badge).
+- Admin panel gains: reported-recipes queue, moderator management
+  (superadmin), banned-users section; claim approve/reject and brand-admin
+  assignment now render only for the superadmin.
+- All enforcement verified with rolled-back impersonation probes
+  (escalation attempts, ban ceilings, flag lifecycle, aggregate exclusion).
+- Accepted residual: moderators keep `brands: admin update` (could toggle
+  `claimed` directly; grants no role power — roles live in profiles).
+
 ## To make yourself admin
 
 After you first sign in (magic link), run in the Supabase SQL editor:
