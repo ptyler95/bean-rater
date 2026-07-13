@@ -4,6 +4,8 @@ import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google"
 import { SiteHeader } from "@/components/site-header"
+import { JsonLd } from "@/components/json-ld"
+import { websiteSchema } from "@/lib/schema"
 import {
   SITE_NAME,
   SITE_DESCRIPTION,
@@ -58,6 +60,7 @@ export default function RootLayout({
       className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <JsonLd data={websiteSchema()} />
         {analyticsEnabled && (
           <>
             <GoogleTagManager gtmId={GTM_ID} />
@@ -77,9 +80,9 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-1 w-full">{children}</main>
         <footer className="border-t py-10">
-          <div className="mx-auto w-full max-w-6xl px-5 flex flex-wrap items-center justify-between gap-4">
+          <div className="mx-auto w-full max-w-6xl px-5 flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="font-heading text-lg">{SITE_NAME}</p>
-            <nav className="flex gap-6 text-sm text-muted-foreground">
+            <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-muted-foreground">
               <Link href="/bags" className="hover:text-foreground">
                 Browse
               </Link>
@@ -88,6 +91,9 @@ export default function RootLayout({
               </Link>
               <Link href="/bags/new" className="hover:text-foreground">
                 Add a bag
+              </Link>
+              <Link href="/about" className="hover:text-foreground">
+                About
               </Link>
               <Link href="/privacy" className="hover:text-foreground">
                 Privacy

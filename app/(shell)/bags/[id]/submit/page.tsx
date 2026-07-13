@@ -1,8 +1,15 @@
 import { notFound } from "next/navigation"
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { RecipeForm } from "./recipe-form"
 import { Constants, type Enums } from "@/lib/database.types"
 import { PROCESS_LABELS, ROAST_LEVEL_LABELS } from "@/lib/labels"
+
+export const metadata: Metadata = {
+  title: "Submit a recipe",
+  description:
+    "Log the dose, temp, grind, and time that worked for your bag — and save the next person a morning of dialing in.",
+}
 
 export default async function SubmitRecipePage({
   params,
@@ -31,7 +38,7 @@ export default async function SubmitRecipePage({
   return (
     <div className="pt-8 max-w-md mx-auto space-y-6">
       <header className="space-y-1">
-        <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+        <p className="text-xs uppercase tracking-wider text-muted-foreground">
           Log a recipe for
         </p>
         <h1 className="text-xl font-semibold tracking-tight">

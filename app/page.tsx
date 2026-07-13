@@ -1,9 +1,18 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
 import { RatingDots } from "@/components/rating-dots"
 import { VerificationBadge } from "@/components/verification-badge"
 import { BREW_METHOD_LABELS, ROAST_LEVEL_LABELS } from "@/lib/labels"
+import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/site"
+
+export const metadata: Metadata = {
+  title: {
+    absolute: `${SITE_NAME} — Brew recipes for your exact bag of coffee`,
+  },
+  description: SITE_DESCRIPTION,
+}
 
 function timeAgo(iso: string) {
   const seconds = Math.max((Date.now() - new Date(iso).getTime()) / 1000, 0)
@@ -102,14 +111,6 @@ export default async function HomePage() {
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Button nativeButton={false} render={<Link href="/bags" />} size="lg">
             Browse bags &amp; recipes →
-          </Button>
-          <Button
-            nativeButton={false}
-            render={<Link href="/bags/new" />}
-            variant="secondary"
-            size="lg"
-          >
-            Add your bag
           </Button>
         </div>
       </section>

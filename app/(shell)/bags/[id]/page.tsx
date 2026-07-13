@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
 import { VerificationBadge } from "@/components/verification-badge"
 import { StatBlock } from "@/components/stat-block"
+import { JsonLd } from "@/components/json-ld"
+import { bagProductSchema } from "@/lib/schema"
 import { MethodTabs } from "./method-tabs"
 import { FlagButton } from "./flag-button"
 import { PROCESS_LABELS, ROAST_LEVEL_LABELS } from "@/lib/labels"
@@ -76,6 +78,16 @@ export default async function BagPage({
 
   return (
     <div className="pt-8 space-y-8">
+      <JsonLd
+        data={bagProductSchema({
+          id: bag.id,
+          coffeeName: bag.coffee_name,
+          brandName: bag.brands?.name ?? null,
+          origin: bag.origin,
+          roastLabel: ROAST_LEVEL_LABELS[bag.roast_level],
+          ratings: (recipes ?? []).map((r) => r.rating),
+        })}
+      />
       {bag.flagged && (
         <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
           This bag is hidden from the public site pending review. You can see
@@ -86,11 +98,11 @@ export default async function BagPage({
       {/* Identity */}
       <header className="space-y-4">
         <div className="space-y-1">
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2">
             {bag.brands ? (
               <Link
                 href={`/roasters/${bag.brands.slug}`}
-                className="hover:text-foreground underline-offset-2 hover:underline"
+                className="text-primary underline underline-offset-2 hover:text-primary/80"
               >
                 {bag.brands.name}
               </Link>

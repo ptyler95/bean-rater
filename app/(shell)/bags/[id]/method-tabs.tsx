@@ -29,7 +29,7 @@ export function MethodTabs({
   if (methods.length === 0) {
     return (
       <div className="rounded-md border border-dashed bg-card px-6 py-12 text-center space-y-3">
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
           No recipes yet
         </p>
         <p className="text-sm text-muted-foreground max-w-sm mx-auto">
@@ -45,15 +45,17 @@ export function MethodTabs({
 
   return (
     <Tabs defaultValue={methods[0].brew_method}>
-      <TabsList className="w-full h-auto flex-wrap justify-start">
+      {/* Chip-style triggers: discrete bordered pills that wrap cleanly on
+          mobile and read as a selector, unlike the shared bg-muted blob. */}
+      <TabsList className="h-auto group-data-horizontal/tabs:h-auto w-full flex-wrap justify-start gap-2 bg-transparent p-0">
         {methods.map((m) => (
           <TabsTrigger
             key={m.brew_method}
             value={m.brew_method}
-            className="font-mono text-xs"
+            className="h-auto flex-none rounded-full border-border bg-card px-3 py-1.5 font-mono text-xs data-active:border-primary data-active:bg-primary data-active:text-primary-foreground"
           >
             {BREW_METHOD_LABELS[m.brew_method]}
-            <span className="ml-1 text-muted-foreground tabular-nums">
+            <span className="ml-1 tabular-nums opacity-60">
               {m.recipe_count}
             </span>
           </TabsTrigger>
@@ -88,7 +90,7 @@ export function MethodTabs({
             )}
 
             <div className="space-y-3">
-              <h3 className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 {hasConsensus ? "All submissions" : "Submissions (newest first)"}
               </h3>
               {methodRecipes.map((r) => (

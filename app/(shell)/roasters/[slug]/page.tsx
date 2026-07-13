@@ -3,11 +3,14 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { StatBlock } from "@/components/stat-block"
-import { BagRow } from "@/components/bag-row"
+import { BagCard } from "@/components/bag-card"
 import { Pager } from "@/components/pager"
+import { JsonLd } from "@/components/json-ld"
+import { roasterBrandSchema } from "@/lib/schema"
 import { ClaimForm } from "./claim-form"
 
-const PAGE_SIZE = 15
+// 12 keeps the 2-up card grid even.
+const PAGE_SIZE = 12
 
 export async function generateMetadata({
   params,
@@ -86,6 +89,15 @@ export default async function RoasterPage({
 
   return (
     <div className="pt-8 space-y-8">
+      <JsonLd
+        data={roasterBrandSchema({
+          slug,
+          name: roaster.name,
+          description: roaster.description,
+          logoUrl: roaster.logo_url,
+          website: roaster.website,
+        })}
+      />
       <header className="space-y-4">
         <div className="flex items-start gap-4">
           {roaster.logo_url && (
@@ -153,10 +165,10 @@ export default async function RoasterPage({
             </p>
           </div>
         ) : (
-          <ul className="divide-y rounded-md border bg-card">
+          <ul className="grid gap-4 sm:grid-cols-2">
             {rows.map((bag) => (
               <li key={bag.bag_id}>
-                <BagRow bag={bag} />
+                <BagCard bag={bag} />
               </li>
             ))}
           </ul>

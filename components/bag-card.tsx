@@ -7,28 +7,28 @@ import type { Database } from "@/lib/database.types"
 type BrowseRow =
   Database["public"]["Functions"]["browse_bags"]["Returns"][number]
 
-/** Directory row: identity on the left, rating + recipe count on the right. */
-export function BagRow({ bag }: { bag: BrowseRow }) {
+/**
+ * Roomy card treatment for a bag — used on roaster pages where the brand
+ * is already known, so no brand eyebrow. Directory listings use BagRow.
+ */
+export function BagCard({ bag }: { bag: BrowseRow }) {
   const count = Number(bag.recipe_count)
   return (
     <Link
       href={`/bags/${bag.bag_id}`}
-      className="flex items-center justify-between gap-3 px-4 py-3 hover:bg-accent"
+      className="flex h-full flex-col rounded-xl border bg-card p-5 transition-colors hover:bg-accent"
     >
-      <span className="min-w-0">
-        <span className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-          {bag.brand_name}
-          <VerificationBadge status={bag.verification_status} />
-        </span>
-        <span className="block text-sm font-medium truncate">
+      <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="font-heading text-2xl leading-tight">
           {bag.coffee_name}
         </span>
-        <span className="block text-xs text-muted-foreground truncate">
-          {bag.origin} · {ROAST_LEVEL_LABELS[bag.roast_level]} ·{" "}
-          {PROCESS_LABELS[bag.process]}
-        </span>
+        <VerificationBadge status={bag.verification_status} />
       </span>
-      <span className="shrink-0 flex flex-col items-end gap-1">
+      <span className="mt-1 block text-xs text-muted-foreground">
+        {bag.origin} · {ROAST_LEVEL_LABELS[bag.roast_level]} ·{" "}
+        {PROCESS_LABELS[bag.process]}
+      </span>
+      <span className="mt-4 flex items-center gap-3 pt-1">
         {bag.avg_rating !== null && (
           <RatingDots value={Number(bag.avg_rating)} />
         )}
