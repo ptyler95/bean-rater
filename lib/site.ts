@@ -13,6 +13,14 @@ export function siteUrl(): string {
   return "http://localhost:3000"
 }
 
+/** Google Tag Manager container + GA4 measurement IDs. */
+export const GTM_ID = "GTM-MHN4WQ2R"
+export const GA4_ID = "G-X64ZN6QLJB"
+
+/** Only fire analytics on the live production deploy — keeps localhost and
+ * Vercel preview traffic out of the data. */
+export const analyticsEnabled = process.env.VERCEL_ENV === "production"
+
 /** Brand palette as hex for OG images (satori doesn't parse oklch). */
 export const OG_COLORS = {
   background: "#F3F5EA", // pale sage

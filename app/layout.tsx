@@ -2,8 +2,16 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google"
 import { SiteHeader } from "@/components/site-header"
-import { SITE_NAME, SITE_DESCRIPTION, siteUrl } from "@/lib/site"
+import {
+  SITE_NAME,
+  SITE_DESCRIPTION,
+  siteUrl,
+  GTM_ID,
+  GA4_ID,
+  analyticsEnabled,
+} from "@/lib/site"
 import "./globals.css"
 
 const inter = Inter({
@@ -50,6 +58,22 @@ export default function RootLayout({
       className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {analyticsEnabled && (
+          <>
+            <GoogleTagManager gtmId={GTM_ID} />
+            <GoogleAnalytics gaId={GA4_ID} />
+            {/* GTM <noscript> fallback — the third-parties component omits it. */}
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+                height="0"
+                width="0"
+                style={{ display: "none", visibility: "hidden" }}
+                title="Google Tag Manager"
+              />
+            </noscript>
+          </>
+        )}
         <SiteHeader />
         <main className="flex-1 w-full">{children}</main>
         <footer className="border-t py-10">
