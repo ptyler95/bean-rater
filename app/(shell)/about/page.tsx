@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
   title: "About",
+  alternates: { canonical: "/about" },
   description:
     "Grounded exists to shrink the effort of dialing in a new bag of coffee — one place for the brew recipes that live scattered across the internet or in a barista's head.",
 }

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     absolute: `${SITE_NAME} — Brew recipes for your exact bag of coffee`,
   },
   description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
 }
 
 function timeAgo(iso: string) {

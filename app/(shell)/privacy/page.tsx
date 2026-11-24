@@ -1,7 +1,11 @@
-export const metadata = { title: "Privacy Policy" }
+import { CONTACT_EMAIL } from "@/lib/site"
 
-const EFFECTIVE_DATE = "July 6, 2026"
-const CONTACT_EMAIL = "preston@namelessconsulting.com"
+export const metadata = {
+  title: "Privacy Policy",
+  alternates: { canonical: "/privacy" },
+}
+
+const EFFECTIVE_DATE = "November 24, 2026"
 
 export default function PrivacyPage() {
   return (
@@ -18,7 +22,8 @@ export default function PrivacyPage() {
         <p>
           <strong>Account data.</strong> When you sign in with a magic link we
           store your email address and a display name derived from it (which
-          appears next to your submissions).
+          appears next to your submissions). We also store whether you have
+          opted in to marketing email, and when.
         </p>
         <p>
           <strong>Content you submit.</strong> Brew recipes (doses, times,
@@ -38,7 +43,17 @@ export default function PrivacyPage() {
         <p>
           To operate the site: showing community recipes, computing aggregate
           &ldquo;community recipe&rdquo; statistics, moderating flagged
-          content, and emailing you sign-in links. That&apos;s it.
+          content, and emailing you sign-in links.
+        </p>
+        <p>
+          <strong>Marketing email is opt-in only.</strong> We send news,
+          product updates, or promotions only to people who have explicitly
+          chosen to receive them, either in the one-time prompt shown after
+          signing in or in the email preferences on your dashboard. Accounts
+          created before this policy took effect are not opted in. We record
+          your choice and the time you made it. Every marketing email has an
+          unsubscribe link, and you can also turn it off on your dashboard
+          at any time. Turning it off does not affect sign-in emails.
         </p>
       </section>
 

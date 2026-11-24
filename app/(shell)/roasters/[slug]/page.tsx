@@ -6,7 +6,7 @@ import { StatBlock } from "@/components/stat-block"
 import { BagCard } from "@/components/bag-card"
 import { Pager } from "@/components/pager"
 import { JsonLd } from "@/components/json-ld"
-import { roasterBrandSchema } from "@/lib/schema"
+import { roasterBrandSchema, breadcrumbSchema } from "@/lib/schema"
 import { ClaimForm } from "./claim-form"
 
 // 12 keeps the 2-up card grid even.
@@ -24,6 +24,7 @@ export async function generateMetadata({
   if (!roaster) return { title: "Roaster not found" }
   return {
     title: roaster.name,
+    alternates: { canonical: `/roasters/${slug}` },
     description:
       roaster.description ??
       `Community brew recipes for ${roaster.name} coffees — ${roaster.bag_count} bags, ${roaster.recipe_count} recipes.`,
@@ -97,6 +98,13 @@ export default async function RoasterPage({
           logoUrl: roaster.logo_url,
           website: roaster.website,
         })}
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Roasters", path: "/roasters" },
+          { name: roaster.name, path: `/roasters/${slug}` },
+        ])}
       />
       <header className="space-y-4">
         <div className="flex items-start gap-4">

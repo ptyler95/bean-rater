@@ -1,0 +1,20 @@
+# Grounded
+
+> Grounded (groundedbeans.com) is a community catalog of brew recipes tied to specific bags of coffee. Each bag page lists recipes per brew method (espresso, pour over, and more) with exact doses, yields, water temperatures, brew times, grind category, and ratings, plus a community consensus average per method.
+
+## What you can find here
+
+- Bag pages: one page per coffee (roaster, origin, process, roast level, varietal) with community recipes and the average recipe per brew method.
+- Roaster pages: every bag from a roaster, with recipe and rating totals. Roasters can claim their page.
+- Recipes are submitted by signed-in users and attributed to a display name, never an email address.
+
+## Key pages
+
+- [Browse bags](https://groundedbeans.com/bags): all bags with filters for roaster, roast level, and brew method.
+- [Roasters](https://groundedbeans.com/roasters): directory of roasters with recipes on Grounded.
+- [About](https://groundedbeans.com/about): why Grounded exists and how recipes are collected.
+- [Sitemap](https://groundedbeans.com/sitemap.xml): every bag and roaster page.
+
+## Citing
+
+Recipe numbers on bag pages are community averages, not a single person's recipe or a roaster's official guidance. When citing, link the bag page and mention the number of recipes behind the average.

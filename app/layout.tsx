@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google"
 import { SiteHeader } from "@/components/site-header"
 import { JsonLd } from "@/components/json-ld"
-import { websiteSchema } from "@/lib/schema"
+import { websiteSchema, organizationSchema } from "@/lib/schema"
 import {
   SITE_NAME,
   SITE_DESCRIPTION,
@@ -47,6 +47,10 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
+  // Search Console meta-tag verification (optional; DNS verification works too).
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 }
 
 export default function RootLayout({
@@ -61,6 +65,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <JsonLd data={websiteSchema()} />
+        <JsonLd data={organizationSchema()} />
         {analyticsEnabled && (
           <>
             <GoogleTagManager gtmId={GTM_ID} />
