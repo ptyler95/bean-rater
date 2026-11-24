@@ -1,9 +1,12 @@
 import Link from "next/link"
+import type { Metadata } from "next"
 import { createClient } from "@/lib/supabase/server"
 import { BagSearch } from "@/components/bag-search"
 import { BagFilters } from "@/components/bag-filters"
 import { BagRow } from "@/components/bag-row"
 import { Pager } from "@/components/pager"
+import { JsonLd } from "@/components/json-ld"
+import { itemListSchema } from "@/lib/schema"
 import { Constants, type Enums } from "@/lib/database.types"
 
 const PAGE_SIZE = 15
@@ -15,7 +18,29 @@ function asEnum<T extends readonly string[]>(
   return v && (values as readonly string[]).includes(v) ? (v as T[number]) : null
 }
 
-export const metadata = { title: "Browse bags" }
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    brand?: string
+    method?: string
+    roast?: string
+    sort?: string
+    page?: string
+  }>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const page = Math.max(parseInt(params.page ?? "1", 10) || 1, 1)
+  const filtered = !!(params.brand || params.method || params.roast || params.sort)
+  return {
+    title: "Browse bags",
+    description:
+      "Browse coffee bags with community brew recipes: filter by roaster, roast level, and brew method.",
+    alternates: { canonical: page > 1 && !filtered ? `/bags?page=${page}` : "/bags" },
+    // Filtered and sorted views duplicate the main list; keep them out of the index.
+    robots: filtered ? { index: false, follow: true } : undefined,
+  }
+}
 
 export default async function BrowseBagsPage({
   searchParams,
@@ -56,6 +81,15 @@ export default async function BrowseBagsPage({
 
   return (
     <div className="pt-10 space-y-8">
+      <JsonLd
+        data={itemListSchema(
+          "Coffee bags with community brew recipes",
+          rows.map((b) => ({
+            name: `${b.brand_name} ${b.coffee_name}`,
+            path: `/bags/${b.bag_id}`,
+          }))
+        )}
+      />
       <section className="space-y-3">
         <h1 className="font-heading text-3xl sm:text-4xl tracking-tight">
           Find brew recipes for your exact bag.

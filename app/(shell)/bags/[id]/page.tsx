@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { VerificationBadge } from "@/components/verification-badge"
 import { StatBlock } from "@/components/stat-block"
 import { JsonLd } from "@/components/json-ld"
-import { bagProductSchema } from "@/lib/schema"
+import { bagProductSchema, bagRecipeSchemas, breadcrumbSchema } from "@/lib/schema"
 import { MethodTabs } from "./method-tabs"
 import { FlagButton } from "./flag-button"
 import { PROCESS_LABELS, ROAST_LEVEL_LABELS } from "@/lib/labels"
@@ -33,6 +33,7 @@ export async function generateMetadata({
   const recipes = count ?? 0
   return {
     title: `${bag.coffee_name} — ${bag.brands?.name}`,
+    alternates: { canonical: `/bags/${id}` },
     description: `${recipes} community brew ${recipes === 1 ? "recipe" : "recipes"} for ${bag.brands?.name} ${bag.coffee_name} (${bag.origin}, ${ROAST_LEVEL_LABELS[bag.roast_level]} roast) — doses, temps, and times per brew method.`,
   }
 }
@@ -87,6 +88,26 @@ export default async function BagPage({
           roastLabel: ROAST_LEVEL_LABELS[bag.roast_level],
           ratings: (recipes ?? []).map((r) => r.rating),
         })}
+      />
+      {(bagRecipeSchemas(
+        {
+          id: bag.id,
+          coffeeName: bag.coffee_name,
+          brandName: bag.brands?.name ?? null,
+        },
+        consensus ?? []
+      )).map((schema, i) => (
+        <JsonLd key={i} data={schema} />
+      ))}
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Bags", path: "/bags" },
+          ...(bag.brands
+            ? [{ name: bag.brands.name, path: `/roasters/${bag.brands.slug}` }]
+            : []),
+          { name: bag.coffee_name, path: `/bags/${bag.id}` },
+        ])}
       />
       {bag.flagged && (
         <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">

@@ -5,6 +5,9 @@ export const SITE_NAME = "Grounded"
 export const SITE_DESCRIPTION =
   "Community brew recipes for specific bags of coffee. Doses, temps, and times — not vibes."
 
+/** Public contact address for legal pages — a forwarding alias, not a personal inbox. */
+export const CONTACT_EMAIL = "privacy@groundedbeans.com"
+
 /** Absolute origin for metadata and OG URLs. Production: groundedbeans.com. */
 export function siteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL

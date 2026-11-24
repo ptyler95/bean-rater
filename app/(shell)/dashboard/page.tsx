@@ -7,6 +7,7 @@ import { BREW_METHOD_LABELS } from "@/lib/labels"
 import { fmtNum, fmtTime } from "@/lib/format"
 import { deleteRecipe } from "./actions"
 import { DisplayNameForm } from "./display-name-form"
+import { EmailPreferencesForm } from "./email-preferences-form"
 
 export const metadata = { title: "My recipes" }
 
@@ -27,7 +28,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name")
+    .select("display_name, marketing_opt_in")
     .eq("user_id", user.id)
     .maybeSingle()
 
@@ -41,6 +42,13 @@ export default async function DashboardPage() {
           Shown publicly on your recipes.
         </p>
         <DisplayNameForm current={profile?.display_name ?? ""} />
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+          Email preferences
+        </h2>
+        <EmailPreferencesForm optedIn={profile?.marketing_opt_in ?? false} />
       </section>
 
       <div className="space-y-4">

@@ -1,7 +1,14 @@
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
+import { JsonLd } from "@/components/json-ld"
+import { itemListSchema } from "@/lib/schema"
 
-export const metadata = { title: "Roasters" }
+export const metadata = {
+  title: "Roasters",
+  description:
+    "Coffee roasters with community brew recipes on Grounded — browse their bags, doses, temps, and times.",
+  alternates: { canonical: "/roasters" },
+}
 
 export default async function RoastersPage() {
   const supabase = await createClient()
@@ -10,6 +17,12 @@ export default async function RoastersPage() {
 
   return (
     <div className="pt-10 space-y-8">
+      <JsonLd
+        data={itemListSchema(
+          "Coffee roasters on Grounded",
+          rows.map((r) => ({ name: r.name, path: `/roasters/${r.slug}` }))
+        )}
+      />
       <section className="space-y-3">
         <h1 className="font-heading text-3xl sm:text-4xl tracking-tight">
           Roasters

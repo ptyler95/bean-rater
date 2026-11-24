@@ -183,6 +183,7 @@ export type Database = {
           claimed: boolean
           claimed_by: string | null
           created_at: string
+          created_by: string | null
           description: string | null
           id: string
           logo_url: string | null
@@ -195,6 +196,7 @@ export type Database = {
           claimed?: boolean
           claimed_by?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           logo_url?: string | null
@@ -207,6 +209,7 @@ export type Database = {
           claimed?: boolean
           claimed_by?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
           logo_url?: string | null
@@ -222,6 +225,10 @@ export type Database = {
           brand_id: string | null
           created_at: string
           display_name: string | null
+          marketing_opt_in: boolean
+          marketing_opt_in_at: string | null
+          marketing_opt_in_source: string | null
+          marketing_prompt_answered_at: string | null
           recipe_count: number
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
@@ -231,6 +238,10 @@ export type Database = {
           brand_id?: string | null
           created_at?: string
           display_name?: string | null
+          marketing_opt_in?: boolean
+          marketing_opt_in_at?: string | null
+          marketing_opt_in_source?: string | null
+          marketing_prompt_answered_at?: string | null
           recipe_count?: number
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
@@ -240,6 +251,10 @@ export type Database = {
           brand_id?: string | null
           created_at?: string
           display_name?: string | null
+          marketing_opt_in?: boolean
+          marketing_opt_in_at?: string | null
+          marketing_opt_in_source?: string | null
+          marketing_prompt_answered_at?: string | null
           recipe_count?: number
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string

@@ -1,7 +1,11 @@
-export const metadata = { title: "Terms of Service" }
+import { CONTACT_EMAIL } from "@/lib/site"
+
+export const metadata = {
+  title: "Terms of Service",
+  alternates: { canonical: "/terms" },
+}
 
 const EFFECTIVE_DATE = "July 6, 2026"
-const CONTACT_EMAIL = "preston@namelessconsulting.com"
 
 export default function TermsPage() {
   return (
